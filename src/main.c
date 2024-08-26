@@ -15,7 +15,7 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    GLFWwindow* window = glfwCreateWindow(800, 600, "NameTBD", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(800, 600, "Cruthu Lonruil", NULL, NULL);
 
     if(!window)
         exit(-1);
