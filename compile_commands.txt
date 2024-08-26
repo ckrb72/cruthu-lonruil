@@ -1,4 +1,4 @@
 Windows:
-g++ src/*.c src/*.cpp -o main -I ./dependencies/include -L ./dependencies/lib -lglfw3dll
+g++ src/*.c -o main -I ./dependencies/include -L ./dependencies/lib -lglfw3dll
 
 Mac: 
