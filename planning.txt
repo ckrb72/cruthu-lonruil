@@ -1,0 +1,9 @@
+
+
+tbdcore_state
+{
+    window_t window;
+    time_t time;
+    input_t input;
+
+};
