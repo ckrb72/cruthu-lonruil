@@ -28,6 +28,7 @@ int main()
     Window win(WIN_WIDTH, WIN_HEIGHT, "Cruthu Lonruil");
     if(!win.is_open())
     {
+        std::cout << "Failed to open window" << std::endl;
         return -1;
     }
 

@@ -1,9 +1,7 @@
 #include "clwindow.h"
 #include <graphics.h>
 #include <GLFW/glfw3.h>
-
-#include <soloud/soloud.h>
-#include <soloud/soloud_wav.h>
+#include <iostream>
 
 static bool init_graphics_api();
 
@@ -16,10 +14,18 @@ Window::Window(int width, int height, const std::string& title)
 :m_title(title)
 {
     glfwInit();
+
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+
     GLFWwindow* window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 
     if(!window)
     {
+        std::cout << "Failed to create window" << std::endl;
         glfwTerminate();
         return;
     }
