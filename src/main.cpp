@@ -15,8 +15,8 @@
 #include "renderer/Shader.h"
 #include "renderer/Texture.h"
 
-const int WIN_WIDTH = 1920;
-const int WIN_HEIGHT = 1080;
+const int WIN_WIDTH = 800;
+const int WIN_HEIGHT = 600;
 
 int main()
 {
