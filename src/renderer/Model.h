@@ -4,20 +4,21 @@
 #include "Vertex.h"
 
 
-class Model
+namespace cl
 {
-private:
-    unsigned int m_vao, m_vbo, m_ebo;
+    class model
+    {
+    private:
+        unsigned int m_vao, m_vbo, m_ebo;
 
-    bool gen_model_gpu();
+        bool gen_model_gpu();
 
-public:
+    public:
 
-    Model();
-    ~Model();
+        model();
+        ~model();
 
-    bool load(const std::string& path);
-    bool load(std::vector<Vertex>& vertices);
-
-    
-};
+        bool load(const std::string& path);
+        bool load(std::vector<vertex>& vertices);
+    };
+}

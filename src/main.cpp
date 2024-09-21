@@ -10,16 +10,14 @@
 #include "renderer/Vertex.h"
 #include "renderer/primitives/2D.h"
 
-#include "renderer/Shader.h"
-#include "renderer/Texture.h"
+#include "renderer/shader.h"
+#include "renderer/texture.h"
 
 const int WIN_WIDTH = 1500;
 const int WIN_HEIGHT = 844;
 
 int main()
 {
-
-    cl::rect rect;
 
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), float(WIN_WIDTH) / (float)WIN_HEIGHT, 0.1f, 100.0f);
     glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -32,20 +30,20 @@ int main()
         return -1;
     }
 
-    Shader shader;
+    cl::shader shader;
     if(!shader.load("./default.vert", "./default.frag"))
     {
         std::cerr << "Failed to load shader" << std::endl;
     }
 
-    Texture tex;
+    cl::texture tex;
     if(!tex.load("./assets/container.jpg", CL_TEXTURE_GENERAL))
     {
         return -1;
     }
 
 
-    Vertex vertices[] = 
+    cl::vertex vertices[] = 
     {
         { { -0.5, -0.5, -5.0 }, { 1.0, 0.0, 0.0 }, { 0.0, 0.0 } },
         { { 0.5, -0.5, -5.0 }, { 0.0, 1.0, 0.0 }, { 1.0, 0.0 } },
@@ -70,13 +68,13 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(cl::vertex), (void*)offsetof(cl::vertex, position));
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(offsetof(Vertex, color)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(cl::vertex), (void*)(offsetof(cl::vertex, color)));
     glEnableVertexAttribArray(1);
 
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(offsetof(Vertex, tex_coords)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(cl::vertex), (void*)(offsetof(cl::vertex, tex_coords)));
     glEnableVertexAttribArray(2);
 
     glBindVertexArray(ebo);
@@ -86,7 +84,6 @@ int main()
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
 
     shader.bind();
     shader.set_int("container", 0);

@@ -8,29 +8,33 @@ enum TexType
     CL_TEXTURE_SPECULAR
 };
 
-class Texture
+namespace cl
 {
-private:
-    unsigned int m_id;
-    unsigned int m_width, m_height, m_channels;
+    class texture
+    {
+    private:
+        unsigned int m_id;
+        unsigned int m_width, m_height, m_channels;
 
-    std::string m_path;
-    TexType m_type;
+        std::string m_path;
+        TexType m_type;
 
-    bool gpu_gen_texture(const unsigned char* image);
-    bool load_texture(const std::string& path);
+        bool gpu_gen_texture(const unsigned char* image);
+        bool load_texture(const std::string& path);
 
-public:
-    Texture();
-    Texture(const Texture& t);        /* Don't forget about those copy constructors */
-    ~Texture();
+    public:
+        texture();
+        texture(const texture& t);        /* Don't forget about those copy constructors */
+        ~texture();
 
-    bool load(const std::string& path);
-    bool load(const std::string& path, TexType type);
-    
-    inline unsigned int get_width() const { return m_width; }
-    inline unsigned int get_height() const { return m_height; }
-    inline unsigned int get_channels() const { return m_channels; }
-    inline unsigned int get_id() const { return m_id; }
-    inline TexType get_type() const { return m_type; }
-};
+        bool load(const std::string& path);
+        bool load(const std::string& path, TexType type);
+
+        inline unsigned int get_width() const { return m_width; }
+        inline unsigned int get_height() const { return m_height; }
+        inline unsigned int get_channels() const { return m_channels; }
+        inline unsigned int get_id() const { return m_id; }
+        inline TexType get_type() const { return m_type; }
+        inline std::string path() const { return m_path; }
+    };
+}
