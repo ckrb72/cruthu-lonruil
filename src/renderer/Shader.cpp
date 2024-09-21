@@ -1,6 +1,6 @@
 #include "Shader.h"
 #include <graphics.h>
-#include "../utils/clfile.h"
+#include "../util/clfile.h"
 #include <iostream>
 
 
@@ -9,6 +9,12 @@
 Shader::Shader()
 {
 
+}
+
+Shader::Shader(const Shader& s)
+{
+    this->m_id = s.m_id;
+    this->m_uniforms = s.m_uniforms;
 }
 
 

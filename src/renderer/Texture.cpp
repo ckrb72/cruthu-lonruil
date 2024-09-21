@@ -8,6 +8,16 @@ Texture::Texture()
 
 }
 
+Texture::Texture(const Texture& t)
+{
+    this->m_channels = t.m_channels;
+    this->m_width = t.m_width;
+    this->m_height = t.m_height;
+    this->m_id = t.m_id;
+    this->m_type = t.m_type;
+    this->m_path = t.m_path;      /* std::string copy constructor deep copies this */
+}
+
 Texture::~Texture()
 {
     glDeleteTextures(1, &m_id);

@@ -2,24 +2,24 @@
 #include "event/event.h"
 #include <string.h>
 #include <graphics.h>
-#include "utils/clfile.h"
+#include "util/clfile.h"
 #include <iostream>
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include "math/clmath.h"
 
 
 #include "renderer/Vertex.h"
-
+#include "renderer/primitives/2D.h"
 
 #include "renderer/Shader.h"
 #include "renderer/Texture.h"
 
-const int WIN_WIDTH = 800;
-const int WIN_HEIGHT = 600;
+const int WIN_WIDTH = 1500;
+const int WIN_HEIGHT = 844;
 
 int main()
 {
+
+    cl::rect rect;
 
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), float(WIN_WIDTH) / (float)WIN_HEIGHT, 0.1f, 100.0f);
     glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -100,6 +100,11 @@ int main()
     {
 
         clPollEvents();
+
+        glm::mat4 model(1.0);
+
+
+        shader.set_mat4fv("model", glm::value_ptr(model));
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0.3f, 0.3f, 0.3f, 1.0f);

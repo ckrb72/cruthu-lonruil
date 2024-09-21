@@ -22,6 +22,7 @@ private:
 
 public:
     Texture();
+    Texture(const Texture& t);        /* Don't forget about those copy constructors */
     ~Texture();
 
     bool load(const std::string& path);
