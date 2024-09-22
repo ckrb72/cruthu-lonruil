@@ -5,9 +5,11 @@
 #include "util/clfile.h"
 #include <iostream>
 #include "math/clmath.h"
+#include "obj/camera.h"
+#include "input/inputManager.h"
 
 
-#include "renderer/Vertex.h"
+#include "renderer/vertex.h"
 #include "renderer/primitives/2D.h"
 
 #include "renderer/shader.h"
@@ -21,9 +23,10 @@ int main()
 
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), float(WIN_WIDTH) / (float)WIN_HEIGHT, 0.1f, 100.0f);
     glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    
-    
-    Window win(WIN_WIDTH, WIN_HEIGHT, "Cruthu Lonruil");
+    glm::quat q;
+
+
+    cl::window win(WIN_WIDTH, WIN_HEIGHT, "Cruthu Lonruil");
     if(!win.is_open())
     {
         std::cout << "Failed to open window" << std::endl;
@@ -41,6 +44,9 @@ int main()
     {
         return -1;
     }
+
+    cl::camera cam;
+    cl::inputManager input(win.get_handle());
 
 
     cl::vertex vertices[] = 
