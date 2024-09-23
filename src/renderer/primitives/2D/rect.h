@@ -5,10 +5,11 @@ namespace cl
     class rect
     {
         private:
-            unsigned int m_glID;
+            unsigned int m_glID, m_texbuf;
             float m_x, m_y;
             float m_width, m_height;
 
+            void gen_rect();
         public:
 
             rect();
