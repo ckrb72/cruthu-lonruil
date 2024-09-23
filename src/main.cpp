@@ -46,7 +46,10 @@ int main()
     }
 
     cl::camera cam;
-    cl::inputManager input(win.get_handle());
+    cam.gen_perspective_projection(glm::radians(45.0f), (float)win.get_width() / win.get_height(), 0.1, 100.0);
+    
+    
+    //cl::inputManager input(win.get_handle());
 
 
     cl::vertex vertices[] = 
@@ -96,8 +99,8 @@ int main()
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex.get_id());
 
-    shader.set_mat4fv("projection", glm::value_ptr(projection));
-    shader.set_mat4fv("view", glm::value_ptr(view));
+    shader.set_mat4fv("projection", glm::value_ptr(cam.get_projection()));
+    shader.set_mat4fv("view", glm::value_ptr(cam.get_view()));
 
     while(!win.should_close())
     {

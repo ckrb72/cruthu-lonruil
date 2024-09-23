@@ -24,5 +24,7 @@ namespace cl
         bool should_close();
         void swap_buffers();
         inline void* get_handle() { return m_win_handle; }
+        inline int get_width() { return m_width; }
+        inline int get_height() { return m_height; }
     };
 }
