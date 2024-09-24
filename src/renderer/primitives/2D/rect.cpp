@@ -14,24 +14,10 @@ namespace cl
         
     }
 
-    rect::rect(float width, float height)
-    {
-
-    }
-
-    rect::rect(float x, float y, float width, float height)
-    {
-
-    }
-
-    rect::rect(const rect& r)
-    {
-
-    }
-
     rect::~rect()
     {
-
+        glDeleteBuffers(1, &m_texbuf);
+        glDeleteVertexArrays(1, &m_glID);
     }
 
     void rect::gen_rect()

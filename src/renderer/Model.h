@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "Vertex.h"
+#include "vertex.h"
 
 
 namespace cl

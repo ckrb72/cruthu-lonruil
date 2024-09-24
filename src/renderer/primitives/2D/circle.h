@@ -1,4 +1,5 @@
 #pragma once
+#include "../../../math/clmath.h"
 
 namespace cl
 {
@@ -6,14 +7,15 @@ namespace cl
     {
         private:
             unsigned int m_glID;
-            float radius;
-            float x, y;
+            float m_radius;
+            float m_x, m_y, m_z;
 
         public:
 
             circle();
             circle(const circle* c);
-            circle(float x, float y, float radius);
+            circle(float x, float y, float z, float radius);
+            circle(const glm::vec3& pos, float r);
             ~circle();
 
             void set_radius(float r);
