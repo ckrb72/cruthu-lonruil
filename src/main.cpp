@@ -7,6 +7,7 @@
 #include "math/clmath.h"
 #include "obj/camera.h"
 #include "input/inputManager.h"
+#include "time.h"
 
 
 #include "renderer/vertex.h"
@@ -33,6 +34,8 @@ int main()
         return -1;
     }
 
+    update_delta();
+
     cl::shader shader;
     if(!shader.load("./default.vert", "./default.frag"))
     {
@@ -46,7 +49,7 @@ int main()
     }
 
     cl::camera cam;
-    cam.gen_perspective_projection(glm::radians(45.0f), (float)win.get_width() / win.get_height(), 0.1, 100.0);
+    cam.gen_perspective_projection(glm::radians(59.0f), (float)win.get_width() / win.get_height(), 0.1, 100.0);
     
     
     //cl::inputManager input(win.get_handle());
@@ -54,10 +57,10 @@ int main()
 
     cl::vertex vertices[] = 
     {
-        { { -0.5, -0.5, -5.0 }, { 1.0, 0.0, 0.0 }, { 0.0, 0.0 } },
-        { { 0.5, -0.5, -5.0 }, { 0.0, 1.0, 0.0 }, { 1.0, 0.0 } },
-        { { 0.5, 0.5, -5.0 }, { 0.0, 0.0, 1.0 }, { 1.0, 1.0 } },
-        { { -0.5, 0.5, -5.0 } , { 1.0, 1.0, 1.0 }, { 0.0, 1.0 } }
+        { { -0.5, -0.5, 0.0 }, { 1.0, 0.0, 0.0 }, { 0.0, 0.0 } },
+        { { 0.5, -0.5, 0.0 }, { 0.0, 1.0, 0.0 }, { 1.0, 0.0 } },
+        { { 0.5, 0.5, 0.0 }, { 0.0, 0.0, 1.0 }, { 1.0, 1.0 } },
+        { { -0.5, 0.5, 0.0 } , { 1.0, 1.0, 1.0 }, { 0.0, 1.0 } }
     };
 
 
@@ -102,15 +105,27 @@ int main()
     shader.set_mat4fv("projection", glm::value_ptr(cam.get_projection()));
     shader.set_mat4fv("view", glm::value_ptr(cam.get_view()));
 
+    glm::vec3 cam_pos = { 0.0, 0.0, 1.0 };
+    cam.set_pos(cam_pos);
+
+    shader.set_mat4fv("view", glm::value_ptr(cam.get_view()));
+
+
     while(!win.should_close())
     {
+
+        update_delta();
 
         clPollEvents();
 
         glm::mat4 model(1.0);
 
 
+        cam_pos.x += 1.0 * delta;
+        cam.set_pos(cam_pos);
+
         shader.set_mat4fv("model", glm::value_ptr(model));
+        shader.set_mat4fv("view", glm::value_ptr(cam.get_view()));
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0.3f, 0.3f, 0.3f, 1.0f);

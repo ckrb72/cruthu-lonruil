@@ -8,7 +8,7 @@ namespace cl
         private:
 
             /* Orientation */
-            glm::vec3 m_pos = { 0.0, 0.0, 1.0 };
+            glm::vec3 m_pos = { 1.0, 0.0, 1.0 };
             glm::vec3 m_dir = { 0.0, 0.0, 0.0 };
             glm::vec3 m_up = { 0.0, 1.0, 0.0 };
 
