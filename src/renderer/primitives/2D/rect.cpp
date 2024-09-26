@@ -41,7 +41,7 @@ namespace cl
 
         glGenVertexArrays(1, &vao);
         glGenBuffers(1, &vbo);
-        glGenBuffers(1, &tex);
+        //glGenBuffers(1, &tex);
         glGenBuffers(1, &ebo);
 
         glBindVertexArray(vao);
@@ -53,8 +53,8 @@ namespace cl
 
         /* TODO: */
         /* Make sure this is correct */
-        glBindBuffer(GL_ARRAY_BUFFER, tex);
-        glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(float), nullptr, GL_DYNAMIC_DRAW);
+        /*glBindBuffer(GL_ARRAY_BUFFER, tex);
+        glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(float), nullptr, GL_DYNAMIC_DRAW);*/
 
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
         glEnableVertexAttribArray(1);
@@ -67,6 +67,8 @@ namespace cl
         /* Need to figure out how to pass texture data in separately in a decently efficient way */
         /* Probably set up buffer here and then glBufferSubData when you get the tex coords */
 
-
+        glBindVertexArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 }

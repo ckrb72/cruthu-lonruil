@@ -1,14 +1,12 @@
 #include "window/clwindow.h"
 #include "event/event.h"
-#include <string.h>
 #include <graphics.h>
-#include "util/clfile.h"
 #include <iostream>
 #include "math/clmath.h"
 #include "obj/camera.h"
 #include "input/inputManager.h"
 #include "time.h"
-
+#include "physics/physicsEngine.h"
 
 #include "renderer/vertex.h"
 #include "renderer/primitives/2D.h"
@@ -21,12 +19,6 @@ const int WIN_HEIGHT = 844;
 
 int main()
 {
-
-    glm::mat4 projection = glm::perspective(glm::radians(45.0f), float(WIN_WIDTH) / (float)WIN_HEIGHT, 0.1f, 100.0f);
-    glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    glm::quat q;
-
-
     cl::window win(WIN_WIDTH, WIN_HEIGHT, "Cruthu Lonruil");
     if(!win.is_open())
     {
@@ -52,7 +44,7 @@ int main()
     cam.gen_perspective_projection(glm::radians(59.0f), (float)win.get_width() / win.get_height(), 0.1, 100.0);
     
     
-    //cl::inputManager input(win.get_handle());
+    cl::inputManager input(win.get_handle());
 
 
     cl::vertex vertices[] = 
@@ -113,15 +105,17 @@ int main()
 
     while(!win.should_close())
     {
-
         update_delta();
 
         clPollEvents();
 
         glm::mat4 model(1.0);
 
+        input.update();
 
-        cam_pos.x += 1.0 * delta;
+        std::cout << input.get_keystate(CLKEY_W) << std::endl;
+
+        //cam_pos.x += 1.0 * delta;
         cam.set_pos(cam_pos);
 
         shader.set_mat4fv("model", glm::value_ptr(model));

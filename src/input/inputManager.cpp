@@ -3,40 +3,54 @@
 #include <iostream>
 namespace cl
 {
-
-    // Need to figure out how to let this access input manager keyboard
-    static void update_keyboard(GLFWwindow* win, int key, int scancode, int action, int mods)
-    {
-        std::cout << scancode << std::endl;
-    }
-
-    inputManager::inputManager()
-    {
-
-    }
-
     inputManager::inputManager(void* win_handle)
     {
-        glfwSetKeyCallback((GLFWwindow*)win_handle, update_keyboard);
+        m_win_handle = win_handle;
     }
 
     inputManager::inputManager(const inputManager& in)
     {
-
+        for(int i = 0; i < CL_NUMKEYCODES; i++)
+        {
+            keyboard[i] = in.keyboard[i];
+        }
     }
 
-    inputManager::~inputManager()
-    {
-
-    }
-
-    keystate inputManager::get_keystate(scancode s)
+    keystate inputManager::get_keystate(keycode s)
     {
         return keyboard[s];
     }
 
-    /*void inputManager::update_key(int scancode)
+    void inputManager::update_key(int keycode)
     {
+        int state = glfwGetKey((GLFWwindow*)m_win_handle, keycode);
 
-    }*/
+        if(state == GLFW_PRESS)
+        {
+            if(keyboard[keycode] == CL_RELEASED)
+            {
+                /* If first frame down, set CL_PRESSED */
+                keyboard[keycode] = CL_PRESSED;
+            }
+            else
+            {
+
+                /* If key already pressed, set CL_HELD */
+                keyboard[keycode] = CL_HELD;
+            }
+        }
+        else
+        {
+            keyboard[keycode] = CL_RELEASED;
+        }
+    }
+
+    void inputManager::update()
+    {
+        /* Go through all the keycodes, updating state as needed */
+        for(int key = CLKEY_SPACE; key < CL_NUMKEYCODES; key++)
+        {
+            update_key(key);
+        }
+    }
 }
