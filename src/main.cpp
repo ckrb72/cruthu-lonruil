@@ -113,7 +113,9 @@ int main()
 
         input.update();
 
-        std::cout << input.get_keystate(CLKEY_W) << std::endl;
+
+        if(input.get_mousebutton(CLMB_LEFT) == CL_PRESSED)
+            std::cout << "Left MB Pressed" << std::endl;
 
         //cam_pos.x += 1.0 * delta;
         cam.set_pos(cam_pos);
@@ -131,13 +133,3 @@ int main()
     }
 
 }
-
-/*
-
-glfw_input_callback(GLFWwindow* window, other, stuff)
-{
-    update input system stuff in here by passing to our own input system class
-    so we can then access it in our own input class
-}
-
-*/

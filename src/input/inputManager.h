@@ -1,17 +1,19 @@
 #pragma once
 #include "../types.h"
 
+#define CL_RELEASED 0
+#define CL_PRESSED 1
+#define CL_HELD 2
+#define CL_DRAG 2             /* Same as CL_HELD but we usually talk about mice being dragged, not held */
+
 #define CL_NUMKEYCODES 348    // Number of scancodes glfw supports
+#define CL_NUMMB 3
 
-#define CL_MBLEFT 0 
-#define CL_MBRIGHT 1
-#define CL_MBMIDDLE 2
-
-enum keystate
+enum mousebutton
 {
-    CL_RELEASED,
-    CL_PRESSED,
-    CL_HELD
+    CLMB_LEFT,
+    CLMB_RIGHT,
+    CLMB_MIDDLE
 };
 
 enum keycode
@@ -138,18 +140,13 @@ enum keycode
     CLKEY_MENU = 348,
 };
 
-enum mouseButtonState
-{
-    CLMB_UP,
-    CLMB_DOWN
-};
 
 struct mouseState
 {
-    int32 x, y;
+    double x, y;
     int32 dx, dy;
 
-    mouseButtonState buttons[3];
+    int buttons[3];
 };
 
 
@@ -161,7 +158,12 @@ namespace cl
         private:
             void* m_win_handle = nullptr;
             mouseState mouse;
-            keystate keyboard[CL_NUMKEYCODES] = { CL_PRESSED };
+            int keyboard[CL_NUMKEYCODES];
+
+            //controller controllers[MAX_CONTROLLERS];
+
+            void update_key(int keycode);
+            void update_mouse();
 
         public:
             inputManager(void* win_handle);
@@ -169,7 +171,12 @@ namespace cl
             ~inputManager() {}
 
             void update();
-            keystate get_keystate(keycode s);
-            void update_key(int keycode);
+            int get_keystate(keycode s) const;
+            int get_mousebutton(mousebutton m) const;
+            int get_mouse_x() const;
+            int get_mouse_y() const;
+            void get_mouse_pos(double& x, double& y);
+            int get_mouse_dx() const;
+            int get_mouse_dy() const;
     };
 }

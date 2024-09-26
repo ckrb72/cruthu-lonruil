@@ -16,7 +16,7 @@ namespace cl
         }
     }
 
-    keystate inputManager::get_keystate(keycode s)
+    int inputManager::get_keystate(keycode s) const
     {
         return keyboard[s];
     }
@@ -52,5 +52,44 @@ namespace cl
         {
             update_key(key);
         }
+
+        /* Update Mouse */
+        update_mouse();
+    }
+
+    void inputManager::update_mouse()
+    {
+        for(int i = CLMB_LEFT; i < 4; i++)
+        {
+            int state = glfwGetMouseButton((GLFWwindow*)m_win_handle, i);
+            
+            if(state == GLFW_PRESS)
+            {
+                if(mouse.buttons[i] == CL_RELEASED)
+                {
+                    mouse.buttons[i] = CL_PRESSED;
+                }
+                else
+                {
+                    mouse.buttons[i] = CL_HELD;
+                }
+            }
+            else
+            {
+                mouse.buttons[i] = CL_RELEASED;
+            }
+        }
+
+        /* Update x, y */
+        glfwGetCursorPos((GLFWwindow*)m_win_handle, &mouse.x, &mouse.y);
+
+        /* Update dx, dy */
+
+        
+    }
+
+    int inputManager::get_mousebutton(mousebutton m) const
+    {
+        return mouse.buttons[m];
     }
 }
