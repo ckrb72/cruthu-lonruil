@@ -14,6 +14,16 @@ Planned Features:
 
 ## Style and Design Guide
 
-User level functions (functions that are exposed to the user of the library) will adhered to the following naming convention: clNameOfFunction()
 
-Hidden internal functions will adhere to the following naming convention: name_of_function(); 
+
+## Build
+To build Cruthú Lonrúil make a build directory and run the cmake file with the generator of your choosing. Then run the generator specific command or cmakes --build command.
+
+An example using MinGW Makefiles on Window would look like this:
+
+```
+mkdir build
+cd build
+cmake ../ -G "MinGW Makefiles"
+make
+```

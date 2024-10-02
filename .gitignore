@@ -1,6 +1,7 @@
 .vscode
-main.exe
 a.exe
 main
 Makefile
 .DS_Store
+build
+cruthu-lonruil.exe

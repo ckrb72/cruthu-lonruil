@@ -1,5 +1,5 @@
 #include "rect.h"
-#include "../vertex.h"
+#include "../../vertex.h"
 #include <graphics.h>
 
 namespace cl

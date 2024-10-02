@@ -1,4 +1,0 @@
-Windows:
-g++ src/*.c src/*.cpp -o main -I ./dependencies/include -L ./dependencies/lib -lglfw3dll
-
-Mac: 
