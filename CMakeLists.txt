@@ -6,7 +6,7 @@ find_package(OpenGL REQUIRED)
 
 set(SOURCE_DIR "${CMAKE_SOURCE_DIR}/src")
 set(INCLUDE_DIR "${CMAKE_SOURCE_DIR}/dependencies/include")
-
+set(CMAKE_CXX_STANDARD 17)
 include_directories(${OPENGL_INCLUDE_DIRS} ${INCLUDE_DIR})
 
 # Don't build docs
