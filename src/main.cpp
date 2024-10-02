@@ -29,13 +29,13 @@ int main()
     update_delta();
 
     cl::shader shader;
-    if(!shader.load("./default.vert", "./default.frag"))
+    if(!shader.load("../default.vert", "../default.frag"))
     {
         std::cerr << "Failed to load shader" << std::endl;
     }
 
     cl::texture tex;
-    if(!tex.load("./assets/container.jpg", CL_TEXTURE_GENERAL))
+    if(!tex.load("../assets/container.jpg", CL_TEXTURE_GENERAL))
     {
         return -1;
     }
