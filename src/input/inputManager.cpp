@@ -81,15 +81,37 @@ namespace cl
         }
 
         /* Update x, y */
-        glfwGetCursorPos((GLFWwindow*)m_win_handle, &mouse.x, &mouse.y);
+        double xpos, ypos;
+        glfwGetCursorPos((GLFWwindow*)m_win_handle, &xpos, &ypos);
 
         /* Update dx, dy */
+        mouse.dx = xpos - mouse.x;
+        mouse.dy = ypos - mouse.y;
 
-        
+        mouse.x = xpos;
+        mouse.y = ypos;
     }
 
     int inputManager::get_mousebutton(mousebutton m) const
     {
         return mouse.buttons[m];
+    }
+
+    double inputManager::get_mouse_x() const
+    {
+        return mouse.x;
+    }
+    double inputManager::get_mouse_y() const
+    {
+        return mouse.y;
+    }
+
+    double inputManager::get_mouse_dx() const
+    {
+        return mouse.dx;
+    }
+    double inputManager::get_mouse_dy() const
+    {
+        return mouse.dy;
     }
 }

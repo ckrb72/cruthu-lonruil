@@ -4,6 +4,9 @@
 #define CL_RELEASED 0
 #define CL_PRESSED 1
 #define CL_HELD 2
+
+/* Probably actually want to define this as something else */
+/* So we can tell if the mouse is just being held or being moved and held */
 #define CL_DRAG 2             /* Same as CL_HELD but we usually talk about mice being dragged, not held */
 
 #define CL_NUMKEYCODES 348    // Number of scancodes glfw supports
@@ -144,7 +147,7 @@ enum keycode
 struct mouseState
 {
     double x, y;
-    int32 dx, dy;
+    double dx, dy;
 
     int buttons[3];
 };
@@ -173,10 +176,10 @@ namespace cl
             void update();
             int get_keystate(keycode s) const;
             int get_mousebutton(mousebutton m) const;
-            int get_mouse_x() const;
-            int get_mouse_y() const;
+            double get_mouse_x() const;
+            double get_mouse_y() const;
             void get_mouse_pos(double& x, double& y);
-            int get_mouse_dx() const;
-            int get_mouse_dy() const;
+            double get_mouse_dx() const;
+            double get_mouse_dy() const;
     };
 }

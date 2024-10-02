@@ -102,7 +102,6 @@ int main()
 
     shader.set_mat4fv("view", glm::value_ptr(cam.get_view()));
 
-
     while(!win.should_close())
     {
         update_delta();
@@ -115,9 +114,18 @@ int main()
 
 
         if(input.get_mousebutton(CLMB_LEFT) == CL_PRESSED)
+        {
             std::cout << "Left MB Pressed" << std::endl;
+            std::cout << input.get_mouse_x() << " " << input.get_mouse_y() << std::endl;
+        }
 
-        //cam_pos.x += 1.0 * delta;
+        if(input.get_mousebutton(CLMB_LEFT) == CL_DRAG)
+        {
+            std::cout << "Dragging LMB" << std::endl;
+            std::cout << input.get_mouse_dx() << " " << input.get_mouse_dy() << std::endl;
+        }
+
+        cam_pos.x += 1.0 * delta;
         cam.set_pos(cam_pos);
 
         shader.set_mat4fv("model", glm::value_ptr(model));
