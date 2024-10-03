@@ -33,18 +33,18 @@ namespace cl
     }
 
 
-    void camera::set_direction(const glm::vec3& dir)
+    /*void camera::set_dir(const glm::vec3& dir)
     {
-        m_dir = dir;
+        m_forward = dir;
 
         m_dirty = true;
-    }
+    }*/
 
-    void camera::set_direction(float x, float y, float z)
+    void camera::set_dir(float x, float y, float z)
     {
-        m_dir.x = x;
-        m_dir.y = y;
-        m_dir.z = z;
+        m_forward.x = x;
+        m_forward.y = y;
+        m_forward.z = z;
 
         m_dirty = true;
     }
@@ -77,18 +77,18 @@ namespace cl
         return m_projection;
     }
 
-    glm::mat4& camera::get_viewprojection()
+    /*glm::mat4& camera::get_viewprojection()
     {
         if(m_dirty)
             gen_matrices();
 
         return m_viewprojection;
-    }
+    }*/
 
     void camera::gen_matrices()
     {
-        m_view = glm::lookAt(m_pos, m_dir, m_up);
-        m_viewprojection = m_projection * m_view;
+        m_view = glm::lookAt(m_pos, m_forward, m_up);
+        //m_viewprojection = m_projection * m_view;
         m_dirty = false;
     }
 
