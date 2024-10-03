@@ -1,6 +1,6 @@
 #pragma once
 #include <map>
-#include "../renderer/texture.h"
+#include "../render/texture.h"
 
 namespace cl
 {

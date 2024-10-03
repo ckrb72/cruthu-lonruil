@@ -1,4 +1,4 @@
-#include "texture.h"
+#include <render/texture.h>
 #include <climage.h>
 #include <graphics.h>
 #include <iostream>

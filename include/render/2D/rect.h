@@ -1,6 +1,6 @@
 #pragma once
-#include "../../../math/clmath.h"
-#include "../../texture.h"
+#include "../../clmath.h"
+#include "../texture.h"
 
 namespace cl
 {

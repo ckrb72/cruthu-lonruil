@@ -1,4 +1,4 @@
-#include "camera.h"
+#include <obj/camera.h>
 
 namespace cl
 {

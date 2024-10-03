@@ -1,4 +1,4 @@
-#include "clwindow.h"
+#include <window/clwindow.h>
 #include <graphics.h>
 #include <GLFW/glfw3.h>
 #include <iostream>

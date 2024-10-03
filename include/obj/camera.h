@@ -1,5 +1,5 @@
 #pragma once
-#include "../math/clmath.h"
+#include "../clmath.h"
 
 namespace cl
 {

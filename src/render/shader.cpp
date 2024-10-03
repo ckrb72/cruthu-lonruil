@@ -1,5 +1,5 @@
-#include "shader.h"
-#include "../util/clfile.h"
+#include <render/shader.h>
+#include <util/clfile.h>
 #include <iostream>
 #include <graphics.h>
 

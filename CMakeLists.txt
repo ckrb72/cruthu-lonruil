@@ -5,9 +5,10 @@ project(cruthu-lonruil)
 find_package(OpenGL REQUIRED)
 
 set(SOURCE_DIR "${CMAKE_SOURCE_DIR}/src")
-set(INCLUDE_DIR "${CMAKE_SOURCE_DIR}/dependencies/include")
+set(DEPS_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/dependencies/include")
+set(INCLUDE_DIR "${CMAKE_SOURCE_DIR}/include")
 set(CMAKE_CXX_STANDARD 17)
-include_directories(${OPENGL_INCLUDE_DIRS} ${INCLUDE_DIR})
+include_directories(${OPENGL_INCLUDE_DIRS} ${DEPS_INCLUDE_DIR} ${INCLUDE_DIR})
 
 # Don't build docs
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "GLFW lib only")

@@ -1,5 +1,5 @@
 #pragma once
-#include "../types.h"
+#include "../cltypes.h"
 
 namespace cl
 {
@@ -15,6 +15,6 @@ namespace cl
 
             bool init();
 
-            uint32 addRigidBody();
+            uint32_t addRigidBody();
     };
 }

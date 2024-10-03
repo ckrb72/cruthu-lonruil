@@ -2,17 +2,17 @@
 #include "event/event.h"
 #include <graphics.h>
 #include <iostream>
-#include "math/clmath.h"
-#include "obj/camera.h"
-#include "input/inputManager.h"
-#include "time.h"
-#include "physics/physicsEngine.h"
+#include <clmath.h>
+#include <obj/camera.h>
+#include <input/inputManager.h>
+#include <cltime.h>
+#include <physics/physicsEngine.h>
 
-#include "renderer/vertex.h"
-#include "renderer/primitives/2D.h"
+#include <render/vertex.h>
+#include <render/2D.h>
 
-#include "renderer/shader.h"
-#include "renderer/texture.h"
+#include <render/shader.h>
+#include <render/texture.h>
 
 const int WIN_WIDTH = 1500;
 const int WIN_HEIGHT = 844;
@@ -58,7 +58,7 @@ int main()
 
     unsigned int indices[] = 
     {
-        0, 1, 2, 
+        0, 1, 2,
         2, 3, 0
     };
 
@@ -112,20 +112,18 @@ int main()
 
         input.update();
 
-
         if(input.get_mousebutton(CLMB_LEFT) == CL_PRESSED)
         {
             std::cout << "Left MB Pressed" << std::endl;
             std::cout << input.get_mouse_x() << " " << input.get_mouse_y() << std::endl;
         }
 
-        if(input.get_mousebutton(CLMB_LEFT) == CL_DRAG)
-        {
-            std::cout << "Dragging LMB" << std::endl;
-            std::cout << input.get_mouse_dx() << " " << input.get_mouse_dy() << std::endl;
-        }
-
-        cam_pos.x += 1.0 * delta;
+        if(input.get_keystate(CLKEY_D))
+            cam_pos.x += 1.0 * delta;
+        
+        if(input.get_keystate(CLKEY_A))
+            cam_pos.x -= 1.0 * delta;
+        
         cam.set_pos(cam_pos);
 
         shader.set_mat4fv("model", glm::value_ptr(model));
@@ -139,5 +137,4 @@ int main()
 
         win.swap_buffers();
     }
-
 }

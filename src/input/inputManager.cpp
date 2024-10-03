@@ -1,4 +1,4 @@
-#include "inputManager.h"
+#include <input/inputManager.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
 namespace cl

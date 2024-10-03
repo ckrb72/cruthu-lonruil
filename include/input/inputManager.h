@@ -1,5 +1,5 @@
 #pragma once
-#include "../types.h"
+#include "../cltypes.h"
 
 #define CL_RELEASED 0
 #define CL_PRESSED 1
