@@ -2,7 +2,7 @@
 
 ## Basic Render Engine
 
-![cruthu lonruil](./assets/cl0.01.png)
+![cruthu lonruil](./assets/cl0.02.JPG)
 
 A basic render engine/library written in C++17. Primarily for educational purposes and because graphics are cool.
 
