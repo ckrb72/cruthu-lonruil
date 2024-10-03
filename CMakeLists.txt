@@ -21,6 +21,17 @@ add_subdirectory(glfw)
 file(GLOB_RECURSE SRC_CXX_FILES "${SOURCE_DIR}/*.cpp")
 file(GLOB_RECURSE SRC_C_FILES "${SOURCE_DIR}/*.c")
 
+if( MSVC )
+    SET( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ENTRY:mainCRTStartup" )
+endif()
+
 add_executable(cruthu-lonruil ${SRC_CXX_FILES} ${SRC_C_FILES})
 target_link_libraries(cruthu-lonruil ${OPENGL_LIBRARIES} glfw)
 
+if( MSVC )
+    if(${CMAKE_VERSION} VERSION_LESS "3.6.0")
+        message( "\n\t[ WARNING ]\n\n\tCMake version lower than 3.6.\n\n\t - Please update CMake and rerun; OR\n\t - Manually set 'GLFW-CMake-starter' as StartUp Project in Visual Studio.\n" )
+    else()
+        set_property( DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT GLFW-CMake-starter )
+    endif()
+endif()
