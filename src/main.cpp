@@ -61,12 +61,84 @@ int main()
 
     cl::vertex vertices[] = 
     {
-        { { -0.5, -0.5, 0.0 }, { 1.0, 0.0, 0.0 }, { 0.0, 0.0 } },
+        { { -0.5, -0.5, -1.0 }, { 1.0, 0.0, 0.0 }, { 0.0, 0.0 } },
         { { 0.5, -0.5, 0.0 }, { 0.0, 1.0, 0.0 }, { 1.0, 0.0 } },
         { { 0.5, 0.5, 0.0 }, { 0.0, 0.0, 1.0 }, { 1.0, 1.0 } },
         { { -0.5, 0.5, 0.0 } , { 1.0, 1.0, 1.0 }, { 0.0, 1.0 } }
     };
 
+    glm::vec3 min{};
+    min.x = vertices[0].position.x;
+    min.y = vertices[0].position.y;
+    min.z = vertices[0].position.z;
+
+    glm::vec3 max{};
+    max.x = vertices[0].position.x;
+    max.y = vertices[0].position.y;
+    max.z = vertices[0].position.z;
+
+
+    for(int i = 0; i < 4; i++)
+    {
+        if(vertices[i].position.x < min.x)
+            min.x = vertices[i].position.x;
+
+        if(vertices[i].position.y < min.y)
+            min.y = vertices[i].position.y;
+
+        if(vertices[i].position.z < min.z)
+            min.z = vertices[i].position.z;
+
+        if(vertices[i].position.x > max.x)
+            max.x = vertices[i].position.x;
+
+        if(vertices[i].position.y > max.y)
+            max.y = vertices[i].position.y;
+
+        if(vertices[i].position.z > max.z)
+            max.z = vertices[i].position.z;
+    }
+
+    float xspan = max.x - min.x;
+    float yspan = max.y - min.y;
+    float zspan = max.z - min.z;
+
+    std::cout << "X: " << xspan << " Y: " << yspan << " Z: " << zspan << std::endl;
+
+
+    float aabb_vertices[] = 
+    {
+        min.x, min.y, min.z,
+        min.x + xspan, min.y, min.z,
+        min.x, min.y, min.z + zspan,
+        min.x + xspan, min.y, min.z + zspan,
+
+        min.x, min.y + yspan, min.z,
+        min.x + xspan, min.y + yspan, min.z,
+        min.x, min.y + yspan, min.z + zspan, 
+        min.x + xspan, min.y + yspan, min.z + zspan
+    };
+
+    unsigned int aabb_indices[] = 
+    {
+        2, 3, 7,
+        7, 6, 2,
+
+        1, 0, 4, 
+        4, 5, 1,
+
+        2, 3, 1,
+        1, 0, 2,
+
+        6, 7, 5,
+        5, 4, 6,
+        
+        0, 2, 6,
+        6, 4, 0,
+
+        3, 1, 5,
+        5, 7, 3
+    };
 
     unsigned int indices[] = 
     {
@@ -113,42 +185,6 @@ int main()
     cam.set_pos(cam_pos);
 
     shader.set_mat4fv("view", glm::value_ptr(cam.get_view()));
-
-
-    float aabb_vertices[] = 
-    {
-        -0.5, -0.5, 0.2,
-        0.5, -0.5, 0.2,
-        0.5, 0.5, 0.2,
-        -0.5, 0.5, 0.2,
-
-
-        -0.5, -0.5, -0.2,
-        0.5, -0.5, -0.2,
-        0.5, 0.5, -0.2,
-        -0.5, 0.5, -0.2
-    };
-
-    unsigned int aabb_indices[] = 
-    {
-        0, 1, 2,
-        2, 3, 0,
-
-        4, 0, 3,
-        3, 7, 4,
-
-        3, 2, 6,
-        6, 7, 3,
-
-        0, 1, 5, 
-        5, 4, 0,
-
-        5, 4, 7, 
-        7, 6, 5,
-        
-        1, 5, 6, 
-        6, 2, 1
-    };
 
     unsigned int aavao, aavbo, aaebo;
     glGenVertexArrays(1, &aavao);
