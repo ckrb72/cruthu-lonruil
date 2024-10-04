@@ -63,7 +63,7 @@ int main()
     {
         { { -0.5, -0.5, -1.0 }, { 1.0, 0.0, 0.0 }, { 0.0, 0.0 } },
         { { 0.5, -0.5, 0.0 }, { 0.0, 1.0, 0.0 }, { 1.0, 0.0 } },
-        { { 0.5, 0.5, 0.0 }, { 0.0, 0.0, 1.0 }, { 1.0, 1.0 } },
+        { { 0.5, 0.5, 1.0 }, { 0.0, 0.0, 1.0 }, { 1.0, 1.0 } },
         { { -0.5, 0.5, 0.0 } , { 1.0, 1.0, 1.0 }, { 0.0, 1.0 } }
     };
 
@@ -103,9 +103,6 @@ int main()
     float yspan = max.y - min.y;
     float zspan = max.z - min.z;
 
-    std::cout << "X: " << xspan << " Y: " << yspan << " Z: " << zspan << std::endl;
-
-
     float aabb_vertices[] = 
     {
         min.x, min.y, min.z,
@@ -121,23 +118,18 @@ int main()
 
     unsigned int aabb_indices[] = 
     {
-        2, 3, 7,
-        7, 6, 2,
-
-        1, 0, 4, 
-        4, 5, 1,
-
-        2, 3, 1,
-        1, 0, 2,
-
-        6, 7, 5,
-        5, 4, 6,
-        
-        0, 2, 6,
-        6, 4, 0,
-
-        3, 1, 5,
-        5, 7, 3
+        2, 3,
+        3, 7,
+        7, 6,
+        6, 2,
+        2, 0,
+        3, 1,
+        6, 4,
+        7, 5,
+        4, 5,
+        5, 1,
+        1, 0,
+        0, 4
     };
 
     unsigned int indices[] = 
@@ -264,7 +256,7 @@ int main()
         aabb_shader.set_mat4fv("view", glm::value_ptr(cam.get_view()));
 
         glBindVertexArray(aavao);
-        glDrawElements(GL_LINE_STRIP, sizeof(aabb_indices) / sizeof(unsigned int), GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_LINES, sizeof(aabb_indices) / sizeof(unsigned int), GL_UNSIGNED_INT, nullptr);
 
         win.swap_buffers();
     }
