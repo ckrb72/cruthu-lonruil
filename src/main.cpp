@@ -7,6 +7,7 @@
 #include <input/inputManager.h>
 #include <cltime.h>
 #include <physics/physicsEngine.h>
+#include <physics/aabb.h>
 
 #include <render/vertex.h>
 #include <render/2D.h>
@@ -61,59 +62,58 @@ int main()
 
     cl::vertex vertices[] = 
     {
-        { { -0.5, -0.5, -1.0 }, { 1.0, 0.0, 0.0 }, { 0.0, 0.0 } },
+        { { -0.5, -0.5, 0.5 }, { 1.0, 0.0, 0.0 }, { 0.0, 0.0 } },
         { { 0.5, -0.5, 0.0 }, { 0.0, 1.0, 0.0 }, { 1.0, 0.0 } },
-        { { 0.5, 0.5, 1.0 }, { 0.0, 0.0, 1.0 }, { 1.0, 1.0 } },
+        { { 0.5, 0.5, 0.0 }, { 0.0, 0.0, 1.0 }, { 1.0, 1.0 } },
         { { -0.5, 0.5, 0.0 } , { 1.0, 1.0, 1.0 }, { 0.0, 1.0 } }
     };
 
-    glm::vec3 min{};
-    min.x = vertices[0].position.x;
-    min.y = vertices[0].position.y;
-    min.z = vertices[0].position.z;
+    cl::aabb bounding_box;
+    bounding_box.min.x = vertices[0].position.x;
+    bounding_box.min.y = vertices[0].position.y;
+    bounding_box.min.z = vertices[0].position.z;
 
-    glm::vec3 max{};
-    max.x = vertices[0].position.x;
-    max.y = vertices[0].position.y;
-    max.z = vertices[0].position.z;
+    bounding_box.max.x = vertices[0].position.x;
+    bounding_box.max.y = vertices[0].position.y;
+    bounding_box.max.z = vertices[0].position.z;
 
 
     for(int i = 0; i < 4; i++)
     {
-        if(vertices[i].position.x < min.x)
-            min.x = vertices[i].position.x;
+        if(vertices[i].position.x < bounding_box.min.x)
+            bounding_box.min.x = vertices[i].position.x;
 
-        if(vertices[i].position.y < min.y)
-            min.y = vertices[i].position.y;
+        if(vertices[i].position.y < bounding_box.min.y)
+            bounding_box.min.y = vertices[i].position.y;
 
-        if(vertices[i].position.z < min.z)
-            min.z = vertices[i].position.z;
+        if(vertices[i].position.z < bounding_box.min.z)
+            bounding_box.min.z = vertices[i].position.z;
 
-        if(vertices[i].position.x > max.x)
-            max.x = vertices[i].position.x;
+        if(vertices[i].position.x > bounding_box.max.x)
+            bounding_box.max.x = vertices[i].position.x;
 
-        if(vertices[i].position.y > max.y)
-            max.y = vertices[i].position.y;
+        if(vertices[i].position.y > bounding_box.max.y)
+            bounding_box.max.y = vertices[i].position.y;
 
-        if(vertices[i].position.z > max.z)
-            max.z = vertices[i].position.z;
+        if(vertices[i].position.z > bounding_box.max.z)
+            bounding_box.max.z = vertices[i].position.z;
     }
 
-    float xspan = max.x - min.x;
-    float yspan = max.y - min.y;
-    float zspan = max.z - min.z;
+    float xspan = bounding_box.max.x - bounding_box.min.x;
+    float yspan = bounding_box.max.y - bounding_box.min.y;
+    float zspan = bounding_box.max.z - bounding_box.min.z;
 
     float aabb_vertices[] = 
     {
-        min.x, min.y, min.z,
-        min.x + xspan, min.y, min.z,
-        min.x, min.y, min.z + zspan,
-        min.x + xspan, min.y, min.z + zspan,
+        bounding_box.min.x, bounding_box.min.y, bounding_box.min.z,
+        bounding_box.min.x + xspan, bounding_box.min.y, bounding_box.min.z,
+        bounding_box.min.x, bounding_box.min.y, bounding_box.min.z + zspan,
+        bounding_box.min.x + xspan, bounding_box.min.y, bounding_box.min.z + zspan,
 
-        min.x, min.y + yspan, min.z,
-        min.x + xspan, min.y + yspan, min.z,
-        min.x, min.y + yspan, min.z + zspan, 
-        min.x + xspan, min.y + yspan, min.z + zspan
+        bounding_box.min.x, bounding_box.min.y + yspan, bounding_box.min.z,
+        bounding_box.min.x + xspan, bounding_box.min.y + yspan, bounding_box.min.z,
+        bounding_box.min.x, bounding_box.min.y + yspan, bounding_box.min.z + zspan, 
+        bounding_box.min.x + xspan, bounding_box.min.y + yspan, bounding_box.min.z + zspan
     };
 
     unsigned int aabb_indices[] = 
@@ -202,6 +202,9 @@ int main()
 
     float move_speed = 1.5f;
 
+    float pitch = 0.0f;
+    float yaw = 0.0f;
+
     while(!win.should_close())
     {
         update_delta();
@@ -217,6 +220,16 @@ int main()
             std::cout << "Left MB Pressed" << std::endl;
             std::cout << input.get_mouse_x() << " " << input.get_mouse_y() << std::endl;
         }
+
+        yaw += input.get_mouse_dx();
+        pitch += input.get_mouse_dy();
+        if(pitch > 89.0f)
+            pitch = 89.0f;
+        
+        if(pitch < -89.0f)
+            pitch = -89.0f;
+
+        std::cout << "Yaw: " << yaw << " Pitch: " << pitch << std::endl;
 
         glm::vec3 dir = cam.get_dir();
         glm::vec3 up = cam.get_up();
