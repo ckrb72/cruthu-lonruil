@@ -11,13 +11,10 @@
 
 #include <render/vertex.h>
 #include <render/2D.h>
+#include <render/model.h>
 
 #include <render/shader.h>
 #include <render/texture.h>
-
-#include <assimp/Importer.hpp> 
-#include <assimp/scene.h>      
-#include <assimp/postprocess.h>
 
 const int WIN_WIDTH = 1500;
 const int WIN_HEIGHT = 844;
@@ -26,7 +23,6 @@ bool disable_cursor = true;
 
 int main()
 {
-    Assimp::Importer importer;
     cl::window win(WIN_WIDTH, WIN_HEIGHT, "Cruthu Lonruil");
     if(!win.is_open())
     {
@@ -62,6 +58,8 @@ int main()
     cl::camera cam;
     cam.gen_perspective_projection(glm::radians(59.0f), (float)win.get_width() / win.get_height(), 0.1, 100.0);
     
+    cl::model model;
+    model.load("../assets/backpack/backpack.obj");
     
     cl::inputManager input(win.get_handle());
     //cl::inputManager input;
