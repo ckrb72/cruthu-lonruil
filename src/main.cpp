@@ -15,6 +15,10 @@
 #include <render/shader.h>
 #include <render/texture.h>
 
+#include <assimp/Importer.hpp> 
+#include <assimp/scene.h>      
+#include <assimp/postprocess.h>
+
 const int WIN_WIDTH = 1500;
 const int WIN_HEIGHT = 844;
 
@@ -22,6 +26,7 @@ bool disable_cursor = true;
 
 int main()
 {
+    Assimp::Importer importer;
     cl::window win(WIN_WIDTH, WIN_HEIGHT, "Cruthu Lonruil");
     if(!win.is_open())
     {
@@ -271,7 +276,7 @@ int main()
         direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
         direction.y = sin(glm::radians(pitch));
         direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-        glm::normalize(direction);
+        direction = glm::normalize(direction);
 
         glm::vec3 dir = cam.get_dir();
         glm::vec3 up = cam.get_up();
