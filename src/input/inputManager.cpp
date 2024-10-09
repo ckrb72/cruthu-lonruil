@@ -57,6 +57,7 @@ namespace cl
         update_mouse();
     }
 
+    /* Might want to put all of this in a mouse callback instead so we can update dx and dy faster than framerate*/
     void inputManager::update_mouse()
     {
         for(int i = CLMB_LEFT; i < 4; i++)

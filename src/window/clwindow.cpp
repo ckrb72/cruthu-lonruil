@@ -43,6 +43,7 @@ namespace cl
         }
 
         glfwSetWindowSizeCallback(window, window_resize_callback);
+        glfwSwapInterval(0);
 
         this->m_width = width;
         this->m_height = height;
@@ -65,6 +66,14 @@ namespace cl
     void window::swap_buffers()
     {
         glfwSwapBuffers((GLFWwindow*)m_win_handle);
+    }
+
+    void window::disable_cursor(bool val)
+    {
+        if(val)
+            glfwSetInputMode((GLFWwindow*)m_win_handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  
+        else
+            glfwSetInputMode((GLFWwindow*)m_win_handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
 
 

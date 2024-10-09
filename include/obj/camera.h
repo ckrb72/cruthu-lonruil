@@ -36,7 +36,7 @@ namespace cl
             void set_pos(float x, float y, float z);
             //void set_dir(const glm::vec3& dir);
             void set_forward(const glm::vec3& forward);
-            void set_dir(float x, float y, float z);
+            //void set_dir(float x, float y, float z);
             void gen_orthographic_projection(float left, float right, float bottom, 
                                              float top, float near, float far);
             void gen_perspective_projection(float fovy, float aspect, float near, float far);

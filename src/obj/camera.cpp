@@ -40,14 +40,19 @@ namespace cl
         m_dirty = true;
     }*/
 
-    void camera::set_dir(float x, float y, float z)
+    /*void camera::set_dir(float x, float y, float z)
     {
         m_forward.x = x;
         m_forward.y = y;
         m_forward.z = z;
 
         m_dirty = true;
-    }
+    }*/
+   void camera::set_forward(const glm::vec3& forward)
+   {
+        m_forward = forward;
+        m_dirty = true;
+   }
 
     void camera::gen_orthographic_projection(float left, float right, float bottom, 
                                              float top, float near, float far)

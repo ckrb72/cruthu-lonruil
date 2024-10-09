@@ -18,6 +18,8 @@
 const int WIN_WIDTH = 1500;
 const int WIN_HEIGHT = 844;
 
+bool disable_cursor = true;
+
 int main()
 {
     cl::window win(WIN_WIDTH, WIN_HEIGHT, "Cruthu Lonruil");
@@ -26,6 +28,8 @@ int main()
         std::cout << "Failed to open window" << std::endl;
         return -1;
     }
+
+     win.disable_cursor(disable_cursor);
 
     update_delta();
 
@@ -55,16 +59,17 @@ int main()
     
     
     cl::inputManager input(win.get_handle());
-
+    //cl::inputManager input;
+    //input.init(win.get_handle(););
 
     glLineWidth(3);
 
 
     cl::vertex vertices[] = 
     {
-        { { -0.5, -0.5, 0.5 }, { 1.0, 0.0, 0.0 }, { 0.0, 0.0 } },
-        { { 0.5, -0.5, 0.0 }, { 0.0, 1.0, 0.0 }, { 1.0, 0.0 } },
-        { { 0.5, 0.5, 0.0 }, { 0.0, 0.0, 1.0 }, { 1.0, 1.0 } },
+        { { -0.5, -0.5, 1.0 }, { 1.0, 0.0, 0.0 }, { 0.0, 0.0 } },
+        { { 0.5, -0.5, -0.5 }, { 0.0, 1.0, 0.0 }, { 1.0, 0.0 } },
+        { { 0.5, 0.5, 1.0 }, { 0.0, 0.0, 1.0 }, { 1.0, 1.0 } },
         { { -0.5, 0.5, 0.0 } , { 1.0, 1.0, 1.0 }, { 0.0, 1.0 } }
     };
 
@@ -138,6 +143,33 @@ int main()
         2, 3, 0
     };
 
+
+    unsigned int framebuffer;
+    glGenFramebuffers(1, &framebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+    unsigned int color_attachment;
+    glGenTextures(1, &color_attachment);
+    glBindTexture(GL_TEXTURE_2D, color_attachment);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, WIN_WIDTH, WIN_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
+    
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color_attachment, 0);
+
+    unsigned int depth_stencil_buffer;
+    glGenRenderbuffers(1, &depth_stencil_buffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, depth_stencil_buffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, WIN_WIDTH, WIN_HEIGHT);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depth_stencil_buffer);
+
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "Failed to complete framebuffer" << std::endl;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     unsigned int vao, vbo, ebo;
 
     glGenVertexArrays(1, &vao);
@@ -203,7 +235,9 @@ int main()
     float move_speed = 1.5f;
 
     float pitch = 0.0f;
-    float yaw = 0.0f;
+    float yaw = -90.0f;
+
+    /* Render pass has one shader and a buffer that holds all of the data to draw in that pass */
 
     while(!win.should_close())
     {
@@ -221,15 +255,23 @@ int main()
             std::cout << input.get_mouse_x() << " " << input.get_mouse_y() << std::endl;
         }
 
-        yaw += input.get_mouse_dx();
-        pitch += input.get_mouse_dy();
-        if(pitch > 89.0f)
-            pitch = 89.0f;
-        
-        if(pitch < -89.0f)
-            pitch = -89.0f;
+        if(disable_cursor)
+        {
+            yaw += input.get_mouse_dx() * 0.1;
+            pitch -= input.get_mouse_dy() * 0.1;
+            if(pitch > 89.0f)
+                pitch = 89.0f;
 
-        std::cout << "Yaw: " << yaw << " Pitch: " << pitch << std::endl;
+            if(pitch < -89.0f)
+                pitch = -89.0f;
+        }
+
+        /* Calculate camera direction from pitch and yaw */
+        glm::vec3 direction;
+        direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+        direction.y = sin(glm::radians(pitch));
+        direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+        glm::normalize(direction);
 
         glm::vec3 dir = cam.get_dir();
         glm::vec3 up = cam.get_up();
@@ -251,9 +293,17 @@ int main()
         
         if(input.get_keystate(CLKEY_LSHIFT))
             cam_pos.y -= move_speed * delta;
+
+        if(input.get_keystate(CLKEY_ESCAPE) == CL_PRESSED)
+        {
+            disable_cursor = !disable_cursor;
+            win.disable_cursor(disable_cursor);
+        }
         
         cam.set_pos(cam_pos);
+        cam.set_forward(cam_pos + direction);
 
+        /* win.clear() */
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 
