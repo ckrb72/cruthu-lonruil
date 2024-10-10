@@ -117,7 +117,7 @@ static cl::mesh process_mesh(aiMesh* mesh, const aiScene* scene)
     }*/
     
     cl::mesh m;
-    //m.generate_mesh(vertices, indices, textures);
+    m.generate_mesh(vertices, indices, textures);
 
     // Note:
     // This copies the mesh which isn't the best solution but works for now

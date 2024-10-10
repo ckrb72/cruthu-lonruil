@@ -60,6 +60,8 @@ int main()
     
     cl::model model;
     model.load("../assets/backpack/backpack.obj");
+
+    std::cout << "Got Here" << std::endl;
     
     cl::inputManager input(win.get_handle());
     //cl::inputManager input;
@@ -70,10 +72,10 @@ int main()
 
     cl::vertex vertices[] = 
     {
-        { { -0.5, -0.5, 1.0 }, { 1.0, 0.0, 0.0 }, { 0.0, 0.0 } },
-        { { 0.5, -0.5, -0.5 }, { 0.0, 1.0, 0.0 }, { 1.0, 0.0 } },
-        { { 0.5, 0.5, 1.0 }, { 0.0, 0.0, 1.0 }, { 1.0, 1.0 } },
-        { { -0.5, 0.5, 0.0 } , { 1.0, 1.0, 1.0 }, { 0.0, 1.0 } }
+        { { -0.5, -0.5, 1.0 }, { 0.0, 0.0, 1.0 }, { 1.0, 0.0, 0.0 }, { 0.0, 0.0 } },
+        { { 0.5, -0.5, -0.5 }, { 0.0, 0.0, 1.0 }, { 0.0, 1.0, 0.0 }, { 1.0, 0.0 } },
+        { { 0.5, 0.5, 1.0 }, { 0.0, 0.0, 1.0 }, { 0.0, 0.0, 1.0 }, { 1.0, 1.0 } },
+        { { -0.5, 0.5, 0.0 } , { 0.0, 0.0, 1.0 }, { 1.0, 1.0, 1.0 }, { 0.0, 1.0 } }
     };
 
     cl::aabb bounding_box;
@@ -240,6 +242,9 @@ int main()
     float pitch = 0.0f;
     float yaw = -90.0f;
 
+
+    std::cout << "Got Here" << std::endl;
+
     /* Render pass has one shader and a buffer that holds all of the data to draw in that pass */
 
     while(!win.should_close())
@@ -314,6 +319,7 @@ int main()
         shader.set_mat4fv("model", glm::value_ptr(model));
         shader.set_mat4fv("view", glm::value_ptr(cam.get_view()));
 
+        // BREAKS RIGHT HERE 
         glBindVertexArray(vao);
         glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(unsigned int), GL_UNSIGNED_INT, nullptr);
 

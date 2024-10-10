@@ -10,9 +10,10 @@ namespace cl
         private:
             std::vector<vertex> m_vertices;
             std::vector<unsigned int> m_indices;
+            std::vector<texture> m_textures;
             // Probably don't want to include textures per mesh
 
-            unsigned int vao, vbo, ebo;
+            unsigned int m_vao, m_vbo, m_ebo;
 
         public:
             mesh() {}
@@ -21,8 +22,8 @@ namespace cl
             // Copy constructor simply copies gpu buffer handles over
             // DOES NOT create a new buffer on the GPU
             mesh(const mesh& m);
-            ~mesh() {}
+            ~mesh();
 
-            //bool generate_mesh(std::vector<vertex>& vertices, std::vector<unsigned int>& indices, std::vector<texture>& textures);
+            bool generate_mesh(const std::vector<vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<texture>& textures);
     };
 }
