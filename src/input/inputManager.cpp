@@ -6,6 +6,7 @@ namespace cl
     inputManager::inputManager(void* win_handle)
     {
         m_win_handle = win_handle;
+        glfwGetCursorPos((GLFWwindow*)win_handle, &mouse.x, &mouse.y);
     }
 
     inputManager::inputManager(const inputManager& in)

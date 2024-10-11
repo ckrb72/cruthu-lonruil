@@ -49,6 +49,9 @@ namespace cl
         this->m_height = height;
         this->m_win_handle = (void*)window;
         this->m_is_open = true;
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
     window::~window()

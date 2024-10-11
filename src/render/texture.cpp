@@ -2,23 +2,84 @@
 #include <climage.h>
 #include <graphics.h>
 #include <iostream>
-
+#include <utility>
 
 namespace cl
 {
-    texture::texture()
+    void texture::release()
     {
 
-    }
-
-    texture::texture(const texture& t)
-    {
-        load(t.m_path);
     }
 
     texture::~texture()
     {
-        glDeleteTextures(1, &m_id);
+        release();
+    }
+
+    texture::texture(const texture& other)
+    :m_id(other.m_id), m_width(other.m_width), m_height(other.m_height), 
+    m_channels(other.m_channels), m_path(other.m_path), m_type(other.m_type)
+    {
+        texture& t = (texture&)other;
+        t.m_id = 0;
+        t.m_width = 0;
+        t.m_height = 0;
+        t.m_channels = 0;
+        t.m_path = "";
+        t.m_type = CL_TEXTURE_GENERAL;
+    }
+
+    texture::texture(texture&& other)
+    :m_id(other.m_id), m_width(other.m_width), m_height(other.m_height), 
+    m_channels(other.m_channels), m_path(other.m_path), m_type(other.m_type)
+    {
+        other.m_id = 0;
+        other.m_width = 0;
+        other.m_height = 0;
+        other.m_channels = 0;
+        other.m_path = "";
+        other.m_type = CL_TEXTURE_GENERAL;
+    }
+
+
+    texture& texture::operator=(const texture& other)
+    {
+        if(this != &other)
+        {
+            release();
+            m_id = other.m_id;
+            m_width = other.m_width;
+            m_height = other.m_height;
+            m_channels = other.m_channels;
+            m_path = other.m_path;
+            m_type = other.m_type;
+
+            // Awful hacky solution but need to make sure other is zero'd out
+            texture& t = (texture&)other;
+            t.m_id = 0;
+            t.m_width = 0;
+            t.m_height = 0;
+            t.m_channels = 0;
+            t.m_path = "";
+            t.m_type = CL_TEXTURE_GENERAL;
+        }
+
+        return *this;
+    }
+
+    texture& texture::operator=(texture&& other)
+    {
+        if(this != &other)
+        {
+            release();
+            std::swap(m_id, other.m_id);
+            std::swap(m_width, other.m_width);
+            std::swap(m_height, other.m_height);
+            std::swap(m_channels, other.m_channels);
+            std::swap(m_path, other.m_path);
+            std::swap(m_type, other.m_type);
+        }
+        return *this;
     }
 
     bool texture::load(const std::string& path)
