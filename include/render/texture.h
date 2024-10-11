@@ -22,10 +22,17 @@ namespace cl
         bool gpu_gen_texture(const unsigned char* image);
         bool load_texture(const std::string& path);
 
+        void release();
+
     public:
-        texture();
-        texture(const texture& t);        /* Don't forget about those copy constructors */
+        texture() {}
         ~texture();
+
+        // Copy constructors as recommended by Khronos Wiki
+        texture(const texture& other);
+        texture& operator=(const texture& other);
+        texture(texture&& other);
+        texture& operator=(texture&& other);
 
         bool load(const std::string& path);
         bool load(const std::string& path, TexType type);

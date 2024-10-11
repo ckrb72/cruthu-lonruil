@@ -8,16 +8,16 @@
 #include <cltime.h>
 #include <physics/physicsEngine.h>
 #include <physics/aabb.h>
+#include <render/model.h>
 
 #include <render/vertex.h>
 #include <render/2D.h>
-#include <render/model.h>
 
 #include <render/shader.h>
 #include <render/texture.h>
 
-const int WIN_WIDTH = 1500;
-const int WIN_HEIGHT = 844;
+const int WIN_WIDTH = 1920;
+const int WIN_HEIGHT = 1080;
 
 bool disable_cursor = true;
 
@@ -41,6 +41,13 @@ int main()
         return -1;
     }
 
+    cl::shader model_shader;
+    if(!model_shader.load("../shader/model.vert", "../shader/model.frag"))
+    {
+        std::cerr << "Failed to load model shader" << std::endl;
+        return -1;
+    }
+
     cl::shader aabb_shader;
     if(!aabb_shader.load("../shader/aabb.vert", "../shader/aabb.frag"))
     {
@@ -49,33 +56,35 @@ int main()
     }
 
     cl::texture tex;
-    if(!tex.load("../assets/container.jpg", CL_TEXTURE_GENERAL))
+    if(!tex.load("../assets/silly.png", CL_TEXTURE_GENERAL))
     {
         std::cout << "Failed to load texture" << std::endl;
+        return -1;
+    }
+
+    cl::model backpack;
+    if(!backpack.load("../assets/backpack/backpack.obj"))
+    {
+        std::cout << "Failed to load backpack" << std::endl;
         return -1;
     }
 
     cl::camera cam;
     cam.gen_perspective_projection(glm::radians(59.0f), (float)win.get_width() / win.get_height(), 0.1, 100.0);
     
-    cl::model model;
-    model.load("../assets/backpack/backpack.obj");
-
-    std::cout << "Got Here" << std::endl;
-    
     cl::inputManager input(win.get_handle());
     //cl::inputManager input;
-    //input.init(win.get_handle(););
+    //input.init(win.get_handle();
 
     glLineWidth(3);
 
 
     cl::vertex vertices[] = 
     {
-        { { -0.5, -0.5, 1.0 }, { 0.0, 0.0, 1.0 }, { 1.0, 0.0, 0.0 }, { 0.0, 0.0 } },
-        { { 0.5, -0.5, -0.5 }, { 0.0, 0.0, 1.0 }, { 0.0, 1.0, 0.0 }, { 1.0, 0.0 } },
-        { { 0.5, 0.5, 1.0 }, { 0.0, 0.0, 1.0 }, { 0.0, 0.0, 1.0 }, { 1.0, 1.0 } },
-        { { -0.5, 0.5, 0.0 } , { 0.0, 0.0, 1.0 }, { 1.0, 1.0, 1.0 }, { 0.0, 1.0 } }
+        { { -0.5, -0.5, 1.0 }, { 0.0, 0.0, 1.0 }, { 1.0, 1.0, 1.0 }, { 0.0, 0.0 } },
+        { { 0.5, -0.5, 1.0 }, { 0.0, 0.0, 1.0 }, { 1.0, 1.0, 1.0 }, { 1.0, 0.0 } },
+        { { 0.5, 0.5, 1.0 }, { 0.0, 0.0, 1.0 }, { 1.0, 1.0, 1.0 }, { 1.0, 1.0 } },
+        { { -0.5, 0.5, 1.0 } , { 0.0, 0.0, 1.0 }, { 1.0, 1.0, 1.0 }, { 0.0, 1.0 } }
     };
 
     cl::aabb bounding_box;
@@ -208,7 +217,6 @@ int main()
     glBindTexture(GL_TEXTURE_2D, tex.get_id());
 
     shader.set_mat4fv("projection", glm::value_ptr(cam.get_projection()));
-    shader.set_mat4fv("view", glm::value_ptr(cam.get_view()));
 
     glm::vec3 cam_pos = { 0.0, 0.0, 1.0 };
     cam.set_pos(cam_pos);
@@ -241,9 +249,6 @@ int main()
 
     float pitch = 0.0f;
     float yaw = -90.0f;
-
-
-    std::cout << "Got Here" << std::endl;
 
     /* Render pass has one shader and a buffer that holds all of the data to draw in that pass */
 
@@ -315,20 +320,26 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 
-        shader.bind();
-        shader.set_mat4fv("model", glm::value_ptr(model));
-        shader.set_mat4fv("view", glm::value_ptr(cam.get_view()));
-
-        // BREAKS RIGHT HERE 
-        glBindVertexArray(vao);
-        glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(unsigned int), GL_UNSIGNED_INT, nullptr);
-
         aabb_shader.bind();
         aabb_shader.set_mat4fv("model", glm::value_ptr(model));
         aabb_shader.set_mat4fv("view", glm::value_ptr(cam.get_view()));
 
-        glBindVertexArray(aavao);
-        glDrawElements(GL_LINES, sizeof(aabb_indices) / sizeof(unsigned int), GL_UNSIGNED_INT, nullptr);
+        //glBindVertexArray(aavao);
+        //glDrawElements(GL_LINES, sizeof(aabb_indices) / sizeof(unsigned int), GL_UNSIGNED_INT, nullptr);
+
+
+        model_shader.bind();
+        model_shader.set_mat4fv("model", glm::value_ptr(model));
+        model_shader.set_mat4fv("view", glm::value_ptr(cam.get_view()));
+        model_shader.set_mat4fv("projection", glm::value_ptr(cam.get_projection()));
+        backpack.draw();
+
+        shader.bind();
+        shader.set_mat4fv("model", glm::value_ptr(model));
+        shader.set_mat4fv("view", glm::value_ptr(cam.get_view()));
+
+        glBindVertexArray(vao);
+        glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(unsigned int), GL_UNSIGNED_INT, nullptr);
 
         win.swap_buffers();
     }

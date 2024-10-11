@@ -1,23 +1,31 @@
 #pragma once
 #include <vector>
-#include <string>
 #include <render/mesh.h>
+#include <string>
+#include <memory>
+
 
 namespace cl
 {
     class model
     {
         private:
-            std::vector<mesh> m_meshes;
+
+            // PERFORMANCE: Using smart ptrs because copy constructors are hard
+            // Will fix those if performance becomes an issue
+            std::vector<std::shared_ptr<mesh>> m_meshes;
+            std::string path;
+
 
         public:
-
-            model() {};
-            model(const model& m);
-            ~model() {};
+            model() {}
+            model(const model& m) = delete;
+            ~model() {}
 
 
             bool load(const std::string& path);
-            void add_mesh(mesh m);
+            void add_mesh(std::shared_ptr<mesh> m);
+
+            void draw();
     };
 }
