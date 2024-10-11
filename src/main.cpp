@@ -69,6 +69,13 @@ int main()
         return -1;
     }
 
+    cl::model jupiter;
+    if(!jupiter.load("../assets/jupiter.obj"))
+    {
+        std::cout << "Failed to load jupiter" << std::endl;
+        return -1;
+    }
+
     cl::camera cam;
     cam.gen_perspective_projection(glm::radians(59.0f), (float)win.get_width() / win.get_height(), 0.1, 100.0);
     
@@ -333,6 +340,12 @@ int main()
         model_shader.set_mat4fv("view", glm::value_ptr(cam.get_view()));
         model_shader.set_mat4fv("projection", glm::value_ptr(cam.get_projection()));
         backpack.draw();
+
+        glm::mat4 jupiter_model = glm::mat4(1.0);
+        jupiter_model = glm::translate(jupiter_model, glm::vec3(-2.0, 0.0, 0.0));
+        jupiter_model = glm::scale(jupiter_model, glm::vec3(0.01, 0.01, 0.01));
+        model_shader.set_mat4fv("model", glm::value_ptr(jupiter_model));
+        jupiter.draw();
 
         shader.bind();
         shader.set_mat4fv("model", glm::value_ptr(model));
