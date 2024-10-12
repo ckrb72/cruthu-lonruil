@@ -3,8 +3,11 @@
 out vec4 final_color;
 
 in vec3 f_norm;
+in vec2 f_tex;
+
+uniform sampler2D diffuse;
 
 void main()
 {
-    final_color = vec4(f_norm, 1.0);
+    final_color = texture(diffuse, f_tex);
 }

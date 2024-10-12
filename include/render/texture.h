@@ -10,6 +10,9 @@ enum TexType
 
 namespace cl
 {
+
+    // REDO: Want to turn this into a struct and cut down on the complexity
+    // Should be a thing wrapper around OpenGL Textures
     class texture
     {
     private:
