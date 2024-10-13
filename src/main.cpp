@@ -291,7 +291,7 @@ int main()
         // Lighting specific stuff
         lighting.set_vec3fv("view_pos", glm::value_ptr(cam_pos));
 
-        lighting.set_float("material.shininess", 32.0f);
+        lighting.set_float("material.shininess", 256.0f);
 
         lighting.set_vec3f("light.ambient",  0.2f, 0.2f, 0.2f);
         lighting.set_vec3f("light.diffuse",  0.5f, 0.5f, 0.5f);

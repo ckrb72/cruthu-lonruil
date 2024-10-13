@@ -58,10 +58,12 @@ void main()
     // Specular
     //float specular_strength = 0.5;
     vec3 view_dir = normalize(view_pos - frag_pos);
-    vec3 reflect_dir = reflect(-light_dir, norm);
+    //vec3 reflect_dir = reflect(-light_dir, norm);
     //float spec = pow(max(dot(view_dir, reflect_dir), 0.0), 32);
     //vec3 specular = specular_strength * spec * light_color;
-    float spec = pow(max(dot(view_dir, reflect_dir), 0.0), material.shininess);
+    vec3 halfway_dir = normalize(light_dir + view_dir);
+    //float spec = pow(max(dot(view_dir, reflect_dir), 0.0), material.shininess);
+    float spec = pow(max(dot(norm, halfway_dir), 0.0), material.shininess);
     //vec3 specular = (spec * material.specular) * light.specular;
     vec3 specular = light.specular * spec * texture(material.specular, f_tex).rgb;
 
