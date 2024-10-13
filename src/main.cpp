@@ -62,6 +62,13 @@ int main()
         return -1;
     }
 
+    cl::texture backpack_specular;
+    if(!backpack_specular.load("../assets/backpack/specular.jpg"))
+    {
+        std::cerr << "Failed to load specular texture" << std::endl;
+        return -1;
+    }
+
     cl::model backpack;
     if(!backpack.load("../assets/backpack/backpack.obj"))
     {
@@ -181,7 +188,7 @@ int main()
     glm::vec3 cam_pos = { 0.0, 0.0, 1.0 };
     cam.set_pos(cam_pos);
 
-    float move_speed = 1.5f;
+    float move_speed = 3.0f;
 
     float pitch = 0.0f;
     float yaw = -90.0f;
@@ -189,6 +196,8 @@ int main()
     float angle = 0.0f;
 
     model_shader.set_int("diffuse", 0);
+    lighting.set_int("material.diffuse", 0);
+    lighting.set_int("material.specular", 1);
 
     while(!win.should_close())
     {
@@ -210,6 +219,11 @@ int main()
             if(pitch < -89.0f)
                 pitch = -89.0f;
         }
+
+        if(input.get_keystate(CLKEY_LCONTROL) == CL_HELD)
+            move_speed = 1.5f;
+        else
+            move_speed = 3.0f;
 
         /* Calculate camera direction from pitch and yaw */
         glm::vec3 direction;
@@ -260,21 +274,34 @@ int main()
         //model_shader.set_mat4fv("view", glm::value_ptr(cam.get_view()));
         //model_shader.set_mat4fv("projection", glm::value_ptr(cam.get_projection()));
 
-        glm::vec3 light_color(1.0);
-        glm::vec3 object_color(1.0);
         glm::vec3 light_pos(1.0);
         glm::vec3 cam_pos = cam.get_pos();
 
         lighting.bind();
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, backpack_tex.get_id());
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, backpack_specular.get_id());
+
         lighting.set_mat4fv("projection", glm::value_ptr(cam.get_projection()));
         lighting.set_mat4fv("view", glm::value_ptr(cam.get_view()));
         lighting.set_mat4fv("model", glm::value_ptr(model));
 
         // Lighting specific stuff
-        lighting.set_vec3fv("light_color", glm::value_ptr(light_color));
-        lighting.set_vec3fv("object_color", glm::value_ptr(object_color));
-        lighting.set_vec3fv("light_pos", glm::value_ptr(light_pos));
         lighting.set_vec3fv("view_pos", glm::value_ptr(cam_pos));
+
+        lighting.set_float("material.shininess", 32.0f);
+
+        lighting.set_vec3f("light.ambient",  0.2f, 0.2f, 0.2f);
+        lighting.set_vec3f("light.diffuse",  0.5f, 0.5f, 0.5f);
+        lighting.set_vec3f("light.specular", 1.0f, 1.0f, 1.0f); 
+        lighting.set_vec3fv("light.position", glm::value_ptr(light_pos));
+        lighting.set_vec3f("light.direction", -0.2f, -1.0f, -0.3f);
+        lighting.set_float("light.constant",  1.0f);
+        lighting.set_float("light.linear",    0.22f);
+        lighting.set_float("light.quadratic", 0.20f);
+
 
         backpack.draw();
 

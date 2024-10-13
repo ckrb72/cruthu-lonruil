@@ -4,7 +4,7 @@
 
 ![textured square](./assets/cl0.02.JPG)
 ![untextured models](./assets/cl0.03.JPG)
-![texture backpack](./assets/cl0.031.JPG)
+![texture backpack w/ lighting](./assets/cl0.04.JPG)
 
 A basic render engine/library written in C++17. Primarily for educational purposes and because graphics are cool.
 
