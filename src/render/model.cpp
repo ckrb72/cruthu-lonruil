@@ -9,7 +9,8 @@
 #include <assimp/postprocess.h>
 
 static bool process_node(cl::model* model, aiNode* node, const aiScene* scene);
-static std::shared_ptr<cl::mesh> process_mesh(aiMesh* mesh, const aiScene* scene);
+static std::shared_ptr<cl::mesh> process_mesh(cl::model* model, aiMesh* mesh, const aiScene* scene);
+static bool load_textures(cl::model* model, aiMaterial* material, aiTextureType type, TexType tex_type, std::vector<std::shared_ptr<cl::texture>>& textures);
 
 namespace cl
 {
@@ -17,13 +18,15 @@ namespace cl
     {
         Assimp::Importer importer;
         
-        const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_FlipUVs);
+        const aiScene* scene = importer.ReadFile(path, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_FlipUVs);
 
         if(!scene)
         {
             std::cout << "Failed to load scene" << std::endl;
             return false;
         }
+
+        directory = path.substr(0, path.find_last_of('/'));
 
         process_node(this, scene->mRootNode, scene);
         return true;
@@ -49,7 +52,7 @@ static bool process_node(cl::model* model, aiNode* node, const aiScene* scene)
     for(int i = 0; i < node->mNumMeshes; i++)
     {
         aiMesh* node_mesh = scene->mMeshes[node->mMeshes[i]];
-        std::shared_ptr<cl::mesh> m = process_mesh(node_mesh, scene);
+        std::shared_ptr<cl::mesh> m = process_mesh(model, node_mesh, scene);
 
         if(m == nullptr)
         {
@@ -68,11 +71,11 @@ static bool process_node(cl::model* model, aiNode* node, const aiScene* scene)
     return true;
 }
 
-static std::shared_ptr<cl::mesh> process_mesh(aiMesh* mesh, const aiScene* scene)
+static std::shared_ptr<cl::mesh> process_mesh(cl::model* model, aiMesh* mesh, const aiScene* scene)
 {
     std::vector<cl::vertex> vertices;
     std::vector<unsigned int> indices;
-    std::vector<cl::texture> textures;
+    std::vector<std::shared_ptr<cl::texture>> textures;
 
     for(int i = 0; i < mesh->mNumVertices; i++)
     {
@@ -119,6 +122,13 @@ static std::shared_ptr<cl::mesh> process_mesh(aiMesh* mesh, const aiScene* scene
     if(mesh->mMaterialIndex >= 0)
     {
         // Process materials
+        aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+
+        if(!load_textures(model, material, aiTextureType_DIFFUSE, CL_TEXTURE_DIFFUSE, textures))
+            return nullptr;
+        
+        if(!load_textures(model, material, aiTextureType_SPECULAR, CL_TEXTURE_SPECULAR, textures))
+            return nullptr;
     }
 
     std::shared_ptr<cl::mesh> m = std::make_shared<cl::mesh>();
@@ -127,4 +137,51 @@ static std::shared_ptr<cl::mesh> process_mesh(aiMesh* mesh, const aiScene* scene
 
     return m;
 
+}
+
+
+static bool load_textures(cl::model* model, aiMaterial* material, aiTextureType type, TexType tex_type, std::vector<std::shared_ptr<cl::texture>>& textures)
+{
+    for(int i = 0; i < material->GetTextureCount(type); i++)
+    {
+        aiString str;
+        material->GetTexture(type, i, &str);
+        
+        // Get full path of texture we want to load
+        std::string full_path = model->get_directory() + "/" + str.C_Str();
+
+        // Get all loaded textures
+        std::vector<std::shared_ptr<cl::texture>>& loaded_textures = model->get_textures();
+
+        bool found = false;
+        for(int j = 0; j < loaded_textures.size(); j++)
+        {
+            // Compare path of texture we want to load with path of loaded textures
+            if(std::strcmp(loaded_textures[j]->path().c_str(), full_path.c_str()) == 0)
+            {
+                // If found, push back the already loaded texture
+                textures.push_back(loaded_textures[i]);
+                found = true;
+                break;
+            }
+        }
+
+        // If we found the texture already, don't load it again so continue
+        if(found)
+            continue;
+
+        
+        std::shared_ptr<cl::texture> tex = std::make_shared<cl::texture>();
+
+        if(!tex->load(full_path, tex_type))
+        {
+            std::cout << "FAILED TEXTURE: " << full_path  << std::endl;
+            return false;
+        }
+
+        textures.push_back(tex);
+        loaded_textures.push_back(tex);
+    }
+
+    return true;
 }

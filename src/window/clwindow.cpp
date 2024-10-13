@@ -22,6 +22,7 @@ namespace cl
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        //glfwWindowHint(GLFW_SAMPLES, 4);
 
 
         GLFWwindow* window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
@@ -52,6 +53,12 @@ namespace cl
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        //glEnable(GL_MULTISAMPLE);
+
+        /*glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        glFrontFace(GL_CCW); */
     }
 
     window::~window()

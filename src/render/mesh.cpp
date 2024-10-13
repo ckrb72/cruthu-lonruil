@@ -75,7 +75,7 @@ namespace cl
 
     bool mesh::generate_mesh(std::vector<vertex> vertices,
                              std::vector<unsigned int> indices,
-                             std::vector<texture> textures)
+                             std::vector<std::shared_ptr<texture>> textures)
     {
         // OpenGL commands here
 
