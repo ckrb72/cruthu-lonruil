@@ -3,6 +3,7 @@
 in vec2 f_tex;
 in vec3 f_norm;
 in vec3 frag_pos;
+in mat3 TBN;
 
 struct Material
 {
@@ -11,6 +12,7 @@ struct Material
     sampler2D diffuse;
     //vec3 specular;
     sampler2D specular;
+    sampler2D normal;
     float shininess;
 };
 
@@ -47,7 +49,10 @@ void main()
     vec3 ambient = texture(material.diffuse, f_tex).rgb * light.ambient;
 
     // Diffuse
-    vec3 norm = normalize(f_norm);
+    vec3 normal = texture(material.normal, f_tex).rgb;
+    normal = normalize(normal * 2.0 - 1.0);
+    normal = normalize(TBN * normal);
+    vec3 norm = normalize(normal);
     vec3 light_dir = normalize(light.position - frag_pos);
     //vec3 light_dir = normalize(-light.direction); //Used for directional lights
     float diff = max(dot(norm, light_dir), 0.0);    // If dot(norm, light_dir) < 0, make diff 0

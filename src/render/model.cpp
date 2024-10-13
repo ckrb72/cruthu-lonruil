@@ -95,6 +95,12 @@ static std::shared_ptr<cl::mesh> process_mesh(cl::model* model, aiMesh* mesh, co
 
         vertex.normal = vector;
 
+        vector.x = mesh->mTangents[i].x;
+        vector.y = mesh->mTangents[i].y;
+        vector.z = mesh->mTangents[i].z;
+
+        vertex.tangent = vector;
+
         if(mesh->mTextureCoords[0])
         {
             glm::vec2 vec;
@@ -129,6 +135,10 @@ static std::shared_ptr<cl::mesh> process_mesh(cl::model* model, aiMesh* mesh, co
         
         if(!load_textures(model, material, aiTextureType_SPECULAR, CL_TEXTURE_SPECULAR, textures))
             return nullptr;
+    
+        if(!load_textures(model, material, aiTextureType_HEIGHT, CL_TEXTURE_BUMP, textures))
+            return nullptr;
+
     }
 
     std::shared_ptr<cl::mesh> m = std::make_shared<cl::mesh>();

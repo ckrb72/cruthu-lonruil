@@ -5,7 +5,8 @@ enum TexType
 {
     CL_TEXTURE_GENERAL,
     CL_TEXTURE_DIFFUSE,
-    CL_TEXTURE_SPECULAR
+    CL_TEXTURE_SPECULAR,
+    CL_TEXTURE_BUMP
 };
 
 namespace cl

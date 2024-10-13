@@ -69,6 +69,13 @@ int main()
         return -1;
     }
 
+    cl::texture backpack_normal;
+    if(!backpack_normal.load("../assets/backpack/normal.png"))
+    {
+        std::cerr << "Failed to load normal" << std::endl;
+        return -1;
+    }
+
     cl::model backpack;
     if(!backpack.load("../assets/backpack/backpack.obj"))
     {
@@ -102,10 +109,10 @@ int main()
 
     cl::vertex vertices[] = 
     {
-        { { -0.5, -0.5, 1.0 }, { 0.0, 0.0, 1.0 }, { 1.0, 1.0, 1.0 }, { 0.0, 0.0 } },
-        { { 0.5, -0.5, 1.0 }, { 0.0, 0.0, 1.0 }, { 1.0, 1.0, 1.0 }, { 1.0, 0.0 } },
-        { { 0.5, 0.5, 1.0 }, { 0.0, 0.0, 1.0 }, { 1.0, 1.0, 1.0 }, { 1.0, 1.0 } },
-        { { -0.5, 0.5, 1.0 } , { 0.0, 0.0, 1.0 }, { 1.0, 1.0, 1.0 }, { 0.0, 1.0 } }
+        { { -0.5, -0.5, 1.0 }, { 0.0, 0.0, 1.0 }, { 1.0, 1.0, 1.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 0.0 } },
+        { { 0.5, -0.5, 1.0 }, { 0.0, 0.0, 1.0 }, { 1.0, 1.0, 1.0 }, { 0.0, 0.0, 0.0 }, { 1.0, 0.0 } },
+        { { 0.5, 0.5, 1.0 }, { 0.0, 0.0, 1.0 }, { 1.0, 1.0, 1.0 }, { 0.0, 0.0, 0.0 }, { 1.0, 1.0 } },
+        { { -0.5, 0.5, 1.0 } , { 0.0, 0.0, 1.0 }, { 1.0, 1.0, 1.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 1.0 } }
     };
 
     cl::aabb bounding_box;
@@ -198,6 +205,7 @@ int main()
     model_shader.set_int("diffuse", 0);
     lighting.set_int("material.diffuse", 0);
     lighting.set_int("material.specular", 1);
+    lighting.set_int("material.normal", 2);
 
     while(!win.should_close())
     {
@@ -283,6 +291,8 @@ int main()
         glBindTexture(GL_TEXTURE_2D, backpack_tex.get_id());
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, backpack_specular.get_id());
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, backpack_normal.get_id());
 
         lighting.set_mat4fv("projection", glm::value_ptr(cam.get_projection()));
         lighting.set_mat4fv("view", glm::value_ptr(cam.get_view()));
@@ -293,8 +303,8 @@ int main()
 
         lighting.set_float("material.shininess", 256.0f);
 
-        lighting.set_vec3f("light.ambient",  0.2f, 0.2f, 0.2f);
-        lighting.set_vec3f("light.diffuse",  0.5f, 0.5f, 0.5f);
+        lighting.set_vec3f("light.ambient",  0.5f, 0.5f, 0.5f);
+        lighting.set_vec3f("light.diffuse",  0.7f, 0.7f, 0.7f);
         lighting.set_vec3f("light.specular", 1.0f, 1.0f, 1.0f); 
         lighting.set_vec3fv("light.position", glm::value_ptr(light_pos));
         lighting.set_vec3f("light.direction", -0.2f, -1.0f, -0.3f);
