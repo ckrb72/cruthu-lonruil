@@ -41,6 +41,13 @@ int main()
         return -1;
     }
 
+    cl::shader lighting;
+    if(!lighting.load("../shader/phong.vert", "../shader/phong.frag"))
+    {
+        std::cerr << "Failed to load lighting shader" << std::endl;
+        return -1;
+    }
+
     cl::texture tex;
     if(!tex.load("../assets/silly.png", CL_TEXTURE_GENERAL))
     {
@@ -245,13 +252,30 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 
-        model_shader.bind();
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, backpack_tex.get_id());
+        //model_shader.bind();
+        //glActiveTexture(GL_TEXTURE0);
+        //glBindTexture(GL_TEXTURE_2D, backpack_tex.get_id());
 
-        model_shader.set_mat4fv("model", glm::value_ptr(model));
-        model_shader.set_mat4fv("view", glm::value_ptr(cam.get_view()));
-        model_shader.set_mat4fv("projection", glm::value_ptr(cam.get_projection()));
+        //model_shader.set_mat4fv("model", glm::value_ptr(model));
+        //model_shader.set_mat4fv("view", glm::value_ptr(cam.get_view()));
+        //model_shader.set_mat4fv("projection", glm::value_ptr(cam.get_projection()));
+
+        glm::vec3 light_color(1.0);
+        glm::vec3 object_color(1.0);
+        glm::vec3 light_pos(1.0);
+        glm::vec3 cam_pos = cam.get_pos();
+
+        lighting.bind();
+        lighting.set_mat4fv("projection", glm::value_ptr(cam.get_projection()));
+        lighting.set_mat4fv("view", glm::value_ptr(cam.get_view()));
+        lighting.set_mat4fv("model", glm::value_ptr(model));
+
+        // Lighting specific stuff
+        lighting.set_vec3fv("light_color", glm::value_ptr(light_color));
+        lighting.set_vec3fv("object_color", glm::value_ptr(object_color));
+        lighting.set_vec3fv("light_pos", glm::value_ptr(light_pos));
+        lighting.set_vec3fv("view_pos", glm::value_ptr(cam_pos));
+
         backpack.draw();
 
         /*glm::mat4 jupiter_model = glm::mat4(1.0);

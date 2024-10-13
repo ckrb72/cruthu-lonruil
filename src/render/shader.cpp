@@ -149,6 +149,22 @@ namespace cl
         glUniform1f(m_uniforms[name], f);
     }
     
-    
+    void shader::set_vec3f(const std::string& name, float x, float y, float z)
+    {
+        this->bind();
+        if(m_uniforms.count(name) == 0)
+            m_uniforms[name] = glGetUniformLocation(m_id, name.c_str());
+
+        glUniform3f(m_uniforms[name], x, y, z);
+    }
+
+    void shader::set_vec3fv(const std::string& name, float* vec)
+    {
+        this->bind();
+        if(m_uniforms.count(name) == 0)
+            m_uniforms[name] = glGetUniformLocation(m_id, name.c_str());
+
+        glUniform3fv(m_uniforms[name], 1, vec);
+    }
     
 };

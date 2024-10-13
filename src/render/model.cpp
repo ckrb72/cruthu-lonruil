@@ -126,6 +126,9 @@ static std::shared_ptr<cl::mesh> process_mesh(cl::model* model, aiMesh* mesh, co
 
         if(!load_textures(model, material, aiTextureType_DIFFUSE, CL_TEXTURE_DIFFUSE, textures))
             return nullptr;
+        
+        if(!load_textures(model, material, aiTextureType_SPECULAR, CL_TEXTURE_SPECULAR, textures))
+            return nullptr;
     }
 
     std::shared_ptr<cl::mesh> m = std::make_shared<cl::mesh>();
