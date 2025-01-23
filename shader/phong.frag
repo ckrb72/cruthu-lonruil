@@ -1,5 +1,9 @@
 #version 410 core
 
+layout(location = 0) out vec4 pos_tex;
+layout(location = 1) out vec4 normal_tex;
+layout(location = 2) out vec4 spec_tex; // also doubles as albedo (x, y, z = color; a = spec)
+
 in vec2 f_tex;
 in vec3 f_norm;
 in vec3 frag_pos;
@@ -73,5 +77,5 @@ void main()
 
     vec3 result = (ambient + diffuse + specular);
 
-    final_color = vec4(result, 1.0);
+    pos_tex = vec4(result, 1.0);
 }

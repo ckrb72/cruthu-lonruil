@@ -34,13 +34,6 @@ int main()
 
     update_delta();
 
-    /*cl::shader model_shader;
-    if(!model_shader.load("../shader/model.vert", "../shader/model.frag"))
-    {
-        std::cerr << "Failed to load model shader" << std::endl;
-        return -1;
-    }*/
-
     cl::shader lighting;
     if(!lighting.load("../shader/phong.vert", "../shader/phong.frag"))
     {
@@ -52,6 +45,13 @@ int main()
     if(!screen_rect.load("../shader/screen_rect.vert", "../shader/screen_rect.frag"))
     {
         std::cerr << "Failed to load screen rect shader" << std::endl;
+        return -1;
+    }
+
+    cl::shader deferred_shader;
+    if(!deferred_shader.load("../shader/phong.vert", "../shader/deferred.frag"))
+    {
+        std::cerr << "Failed to load deferred shader" << std::endl;
         return -1;
     }
 
@@ -102,16 +102,33 @@ int main()
     glGenFramebuffers(1, &framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
-    unsigned int color_attachment;
-    glGenTextures(1, &color_attachment);
-    glBindTexture(GL_TEXTURE_2D, color_attachment);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, WIN_WIDTH, WIN_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    unsigned int pos_attachment, normal_attachment, spec_attachment;
+    glGenTextures(1, &pos_attachment);
+    glBindTexture(GL_TEXTURE_2D, pos_attachment);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, WIN_WIDTH, WIN_HEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
-    glBindTexture(GL_TEXTURE_2D, 0);
-    
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color_attachment, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pos_attachment, 0);
 
+    glGenTextures(1, &normal_attachment);
+    glBindTexture(GL_TEXTURE_2D, normal_attachment);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, WIN_WIDTH, WIN_HEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, normal_attachment, 0);
+
+    glGenTextures(1, &spec_attachment);
+    glBindTexture(GL_TEXTURE_2D, spec_attachment);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, WIN_WIDTH, WIN_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, spec_attachment, 0);
+    
+
+    // Tells opengl what attachments we want to be able to render to so we can access them in the fragment shader
+    unsigned int attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+    glDrawBuffers(3, attachments);
+    
     unsigned int depth_stencil_buffer;
     glGenRenderbuffers(1, &depth_stencil_buffer);
     glBindRenderbuffer(GL_RENDERBUFFER, depth_stencil_buffer);
@@ -177,6 +194,10 @@ int main()
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    deferred_shader.bind();
+    deferred_shader.set_int("diffuse", 0);
+    deferred_shader.set_int("specular", 1);
 
 
     while(!win.should_close())
@@ -248,55 +269,21 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 
-        //model_shader.bind();
-        //glActiveTexture(GL_TEXTURE0);
-        //glBindTexture(GL_TEXTURE_2D, backpack_tex.get_id());
-
-        //model_shader.set_mat4fv("model", glm::value_ptr(model));
-        //model_shader.set_mat4fv("view", glm::value_ptr(cam.get_view()));
-        //model_shader.set_mat4fv("projection", glm::value_ptr(cam.get_projection()));
-
         glm::vec3 light_pos(1.0);
         glm::vec3 cam_pos = cam.get_pos();
 
-        lighting.bind();
+        deferred_shader.bind();
+
+        deferred_shader.set_mat4fv("projection", glm::value_ptr(cam.get_projection()));
+        deferred_shader.set_mat4fv("view", glm::value_ptr(cam.get_view()));
+        deferred_shader.set_mat4fv("model", glm::value_ptr(model));
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, backpack_tex.get_id());
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, backpack_specular.get_id());
 
-        lighting.set_mat4fv("projection", glm::value_ptr(cam.get_projection()));
-        lighting.set_mat4fv("view", glm::value_ptr(cam.get_view()));
-        lighting.set_mat4fv("model", glm::value_ptr(model));
-
-        // Lighting specific stuff
-        lighting.set_vec3fv("view_pos", glm::value_ptr(cam_pos));
-
-        lighting.set_float("material.shininess", 256.0f);
-
-        lighting.set_vec3f("light.ambient",  0.2f, 0.2f, 0.2f);
-        lighting.set_vec3f("light.diffuse",  0.5f, 0.5f, 0.5f);
-        lighting.set_vec3f("light.specular", 1.0f, 1.0f, 1.0f); 
-        lighting.set_vec3fv("light.position", glm::value_ptr(light_pos));
-        lighting.set_vec3f("light.direction", -0.2f, -1.0f, -0.3f);
-        lighting.set_float("light.constant",  1.0f);
-        lighting.set_float("light.linear",    0.22f);
-        lighting.set_float("light.quadratic", 0.20f);
-
-
         backpack.draw();
-
-        /*glm::mat4 jupiter_model = glm::mat4(1.0);
-        jupiter_model = glm::translate(jupiter_model, glm::vec3(-2.0, 0.0, 0.0));
-        //jupiter_model = glm::scale(jupiter_model, glm::vec3(0.01, 0.01, 0.01));
-        jupiter_model = glm::rotate(jupiter_model, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
-        jupiter_model = glm::rotate(jupiter_model, glm::radians(angle), glm::vec3(0.0, 0.0, 1.0));
-        model_shader.set_mat4fv("model", glm::value_ptr(jupiter_model));
-        //jupiter.draw();
-        donut.draw();*/
-
-        //angle += 10.0 * delta;
 
         // Now output to default framebuffer on screen
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -308,7 +295,7 @@ int main()
         
         screen_rect.set_int("frame_tex", 0);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, color_attachment);
+        glBindTexture(GL_TEXTURE_2D, spec_attachment);
 
         glBindVertexArray(vao);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
