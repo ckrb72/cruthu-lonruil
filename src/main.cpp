@@ -243,6 +243,8 @@ int main()
         cam.set_forward(cam_pos + direction);
 
         /* win.clear() */
+
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 
@@ -254,7 +256,7 @@ int main()
         //model_shader.set_mat4fv("view", glm::value_ptr(cam.get_view()));
         //model_shader.set_mat4fv("projection", glm::value_ptr(cam.get_projection()));
 
-        /*glm::vec3 light_pos(1.0);
+        glm::vec3 light_pos(1.0);
         glm::vec3 cam_pos = cam.get_pos();
 
         lighting.bind();
@@ -283,7 +285,7 @@ int main()
         lighting.set_float("light.quadratic", 0.20f);
 
 
-        backpack.draw();*/
+        backpack.draw();
 
         /*glm::mat4 jupiter_model = glm::mat4(1.0);
         jupiter_model = glm::translate(jupiter_model, glm::vec3(-2.0, 0.0, 0.0));
@@ -298,6 +300,10 @@ int main()
 
         // Now output to default framebuffer on screen
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+        
         screen_rect.bind();
         
         screen_rect.set_int("frame_tex", 0);
