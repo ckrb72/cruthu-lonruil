@@ -34,17 +34,24 @@ int main()
 
     update_delta();
 
-    cl::shader model_shader;
+    /*cl::shader model_shader;
     if(!model_shader.load("../shader/model.vert", "../shader/model.frag"))
     {
         std::cerr << "Failed to load model shader" << std::endl;
         return -1;
-    }
+    }*/
 
     cl::shader lighting;
     if(!lighting.load("../shader/phong.vert", "../shader/phong.frag"))
     {
         std::cerr << "Failed to load lighting shader" << std::endl;
+        return -1;
+    }
+
+    cl::shader screen_rect;
+    if(!screen_rect.load("../shader/screen_rect.vert", "../shader/screen_rect.frag"))
+    {
+        std::cerr << "Failed to load screen rect shader" << std::endl;
         return -1;
     }
 
@@ -76,29 +83,12 @@ int main()
         return -1;
     }
 
-    cl::model jupiter;
-    if(!jupiter.load("../assets/jupiter.obj"))
-    {
-        std::cout << "Failed to load jupiter" << std::endl;
-        return -1;
-    }
-
-    cl::model donut;
-    if(!donut.load("../assets/donut.fbx"))
-    {
-        std::cout << "Failed to load donut" << std::endl;
-        return -1;
-    }
-
     cl::camera cam;
     cam.gen_perspective_projection(glm::radians(59.0f), (float)win.get_width() / win.get_height(), 0.1, 100.0);
     
     cl::inputManager input(win.get_handle());
     //cl::inputManager input;
     //input.init(win.get_handle();
-
-    glLineWidth(3);
-
 
     cl::vertex vertices[] = 
     {
@@ -107,56 +97,6 @@ int main()
         { { 0.5, 0.5, 1.0 }, { 0.0, 0.0, 1.0 }, { 1.0, 1.0, 1.0 }, { 1.0, 1.0 } },
         { { -0.5, 0.5, 1.0 } , { 0.0, 0.0, 1.0 }, { 1.0, 1.0, 1.0 }, { 0.0, 1.0 } }
     };
-
-    cl::aabb bounding_box;
-    bounding_box.min.x = vertices[0].position.x;
-    bounding_box.min.y = vertices[0].position.y;
-    bounding_box.min.z = vertices[0].position.z;
-
-    bounding_box.max.x = vertices[0].position.x;
-    bounding_box.max.y = vertices[0].position.y;
-    bounding_box.max.z = vertices[0].position.z;
-
-
-    for(int i = 0; i < 4; i++)
-    {
-        if(vertices[i].position.x < bounding_box.min.x)
-            bounding_box.min.x = vertices[i].position.x;
-
-        if(vertices[i].position.y < bounding_box.min.y)
-            bounding_box.min.y = vertices[i].position.y;
-
-        if(vertices[i].position.z < bounding_box.min.z)
-            bounding_box.min.z = vertices[i].position.z;
-
-        if(vertices[i].position.x > bounding_box.max.x)
-            bounding_box.max.x = vertices[i].position.x;
-
-        if(vertices[i].position.y > bounding_box.max.y)
-            bounding_box.max.y = vertices[i].position.y;
-
-        if(vertices[i].position.z > bounding_box.max.z)
-            bounding_box.max.z = vertices[i].position.z;
-    }
-
-    float xspan = bounding_box.max.x - bounding_box.min.x;
-    float yspan = bounding_box.max.y - bounding_box.min.y;
-    float zspan = bounding_box.max.z - bounding_box.min.z;
-
-    float aabb_vertices[] = 
-    {
-        bounding_box.min.x, bounding_box.min.y, bounding_box.min.z,
-        bounding_box.min.x + xspan, bounding_box.min.y, bounding_box.min.z,
-        bounding_box.min.x, bounding_box.min.y, bounding_box.min.z + zspan,
-        bounding_box.min.x + xspan, bounding_box.min.y, bounding_box.min.z + zspan,
-
-        bounding_box.min.x, bounding_box.min.y + yspan, bounding_box.min.z,
-        bounding_box.min.x + xspan, bounding_box.min.y + yspan, bounding_box.min.z,
-        bounding_box.min.x, bounding_box.min.y + yspan, bounding_box.min.z + zspan, 
-        bounding_box.min.x + xspan, bounding_box.min.y + yspan, bounding_box.min.z + zspan
-    };
-
-
 
     unsigned int framebuffer;
     glGenFramebuffers(1, &framebuffer);
@@ -168,6 +108,7 @@ int main()
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, WIN_WIDTH, WIN_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
+    glBindTexture(GL_TEXTURE_2D, 0);
     
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color_attachment, 0);
 
@@ -195,9 +136,48 @@ int main()
     
     float angle = 0.0f;
 
-    model_shader.set_int("diffuse", 0);
+    //model_shader.set_int("diffuse", 0);
     lighting.set_int("material.diffuse", 0);
     lighting.set_int("material.specular", 1);
+
+
+    // Data for screen sized rectangle to draw frame texture to
+    unsigned int vao, vbo, ebo;
+    glGenVertexArrays(1, &vao);
+    glGenBuffers(1, &vbo);
+    glGenBuffers(1, &ebo);
+
+    float screen_rect_vertices[] = 
+    {
+        -1.0, -1.0,     0.0, 0.0,
+        1.0, -1.0,      1.0, 0.0,
+        1.0, 1.0,       1.0, 1.0,
+        -1.0, 1.0,      0.0, 1.0
+    };
+
+    unsigned int screen_rect_indices[] = 
+    {
+        0, 1, 2,
+        2, 3, 0
+    };
+
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(screen_rect_vertices), screen_rect_vertices, GL_STATIC_DRAW);
+    
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(screen_rect_indices), screen_rect_indices, GL_STATIC_DRAW);
+
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
 
     while(!win.should_close())
     {
@@ -274,7 +254,7 @@ int main()
         //model_shader.set_mat4fv("view", glm::value_ptr(cam.get_view()));
         //model_shader.set_mat4fv("projection", glm::value_ptr(cam.get_projection()));
 
-        glm::vec3 light_pos(1.0);
+        /*glm::vec3 light_pos(1.0);
         glm::vec3 cam_pos = cam.get_pos();
 
         lighting.bind();
@@ -303,7 +283,7 @@ int main()
         lighting.set_float("light.quadratic", 0.20f);
 
 
-        backpack.draw();
+        backpack.draw();*/
 
         /*glm::mat4 jupiter_model = glm::mat4(1.0);
         jupiter_model = glm::translate(jupiter_model, glm::vec3(-2.0, 0.0, 0.0));
@@ -314,7 +294,18 @@ int main()
         //jupiter.draw();
         donut.draw();*/
 
-        angle += 10.0 * delta;
+        //angle += 10.0 * delta;
+
+        // Now output to default framebuffer on screen
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        screen_rect.bind();
+        
+        screen_rect.set_int("frame_tex", 0);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, color_attachment);
+
+        glBindVertexArray(vao);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
 
         win.swap_buffers();
     }
