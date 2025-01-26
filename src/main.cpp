@@ -109,7 +109,7 @@ int main()
     glGenFramebuffers(1, &framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
-    unsigned int pos_attachment, normal_attachment, spec_attachment;
+    unsigned int pos_attachment, normal_attachment, albedo_attachment, spec_attachment;
     glGenTextures(1, &pos_attachment);
     glBindTexture(GL_TEXTURE_2D, pos_attachment);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, WIN_WIDTH, WIN_HEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
@@ -124,17 +124,23 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, normal_attachment, 0);
 
+    glGenTextures(1, &albedo_attachment);
+    glBindTexture(GL_TEXTURE_2D, albedo_attachment);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, WIN_WIDTH, WIN_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, albedo_attachment, 0);
+    
     glGenTextures(1, &spec_attachment);
     glBindTexture(GL_TEXTURE_2D, spec_attachment);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, WIN_WIDTH, WIN_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, spec_attachment, 0);
-    
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, spec_attachment, 0);
 
     // Tells opengl what attachments we want to be able to render to so we can access them in the fragment shader
-    unsigned int attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
-    glDrawBuffers(3, attachments);
+    unsigned int attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+    glDrawBuffers(4, attachments);
     
     unsigned int depth_stencil_buffer;
     glGenRenderbuffers(1, &depth_stencil_buffer);
@@ -209,7 +215,8 @@ int main()
     deferred_light.bind();
     deferred_light.set_int("pos_tex", 0);
     deferred_light.set_int("norm_tex", 1);
-    deferred_light.set_int("albedo_spec_tex", 2);
+    deferred_light.set_int("albedo_tex", 2);
+    deferred_light.set_int("spec_tex", 3);
 
     while(!win.should_close())
     {
@@ -312,6 +319,8 @@ int main()
         glActiveTexture(GL_TEXTURE1),
         glBindTexture(GL_TEXTURE_2D, normal_attachment);
         glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, albedo_attachment);
+        glActiveTexture(GL_TEXTURE3);
         glBindTexture(GL_TEXTURE_2D, spec_attachment);
 
         glBindVertexArray(vao);
