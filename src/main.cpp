@@ -48,10 +48,17 @@ int main()
         return -1;
     }
 
-    cl::shader deferred_shader;
-    if(!deferred_shader.load("../shader/phong.vert", "../shader/deferred.frag"))
+    cl::shader deferred_geometry;
+    if(!deferred_geometry.load("../shader/phong.vert", "../shader/deferred.frag"))
     {
         std::cerr << "Failed to load deferred shader" << std::endl;
+        return -1;
+    }
+
+    cl::shader deferred_light;
+    if(!deferred_light.load("../shader/deferred_light.vert", "../shader/deferred_light.frag"))
+    {
+        std::cerr << "Failed to load deferred lighting shader" << std::endl;
         return -1;
     }
 
@@ -195,10 +202,14 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    deferred_shader.bind();
-    deferred_shader.set_int("diffuse", 0);
-    deferred_shader.set_int("specular", 1);
+    deferred_geometry.bind();
+    deferred_geometry.set_int("diffuse", 0);
+    deferred_geometry.set_int("specular", 1);
 
+    deferred_light.bind();
+    deferred_light.set_int("pos_tex", 0);
+    deferred_light.set_int("norm_tex", 1);
+    deferred_light.set_int("albedo_spec_tex", 2);
 
     while(!win.should_close())
     {
@@ -267,16 +278,16 @@ int main()
 
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
         glm::vec3 light_pos(1.0);
         glm::vec3 cam_pos = cam.get_pos();
 
-        deferred_shader.bind();
+        deferred_geometry.bind();
 
-        deferred_shader.set_mat4fv("projection", glm::value_ptr(cam.get_projection()));
-        deferred_shader.set_mat4fv("view", glm::value_ptr(cam.get_view()));
-        deferred_shader.set_mat4fv("model", glm::value_ptr(model));
+        deferred_geometry.set_mat4fv("projection", glm::value_ptr(cam.get_projection()));
+        deferred_geometry.set_mat4fv("view", glm::value_ptr(cam.get_view()));
+        deferred_geometry.set_mat4fv("model", glm::value_ptr(model));
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, backpack_tex.get_id());
@@ -291,10 +302,16 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
         
-        screen_rect.bind();
-        
-        screen_rect.set_int("frame_tex", 0);
+        deferred_light.bind();
+
+        deferred_light.set_vec3f("light_pos", 1.0, 1.0, 1.0);
+        deferred_light.set_vec3fv("view_pos", glm::value_ptr(cam_pos));
+
         glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, pos_attachment);
+        glActiveTexture(GL_TEXTURE1),
+        glBindTexture(GL_TEXTURE_2D, normal_attachment);
+        glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, spec_attachment);
 
         glBindVertexArray(vao);

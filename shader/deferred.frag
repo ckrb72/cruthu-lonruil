@@ -15,5 +15,5 @@ void main()
     pos_tex = vec4(frag_pos, 1.0);
     norm_tex = vec4(normalize(f_norm), 1.0);
     spec_tex.rgb = texture(diffuse, f_tex).rgb;
-    spec_tex.a = texture(specular, f_tex).r;
+    spec_tex.a = 1.0;   // This messes everything up for some reason (should be texture(specular, f_tex).r;)
 }
